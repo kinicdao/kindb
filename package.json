@@ -1,0 +1,33 @@
+{
+  "name": "kinicdb",
+  "version": "0.0.0",
+  "dependencies": {
+    "@dfinity/agent": "^0.15.5",
+    "@dfinity/candid": "^0.15.5",
+    "@dfinity/identity": "^0.15.5",
+    "@dfinity/identity-secp256k1": "^0.15.5",
+    "@dfinity/principal": "^0.15.5",
+    "candb-client-typescript": "^0.0.0-alpha.1",
+    "node-fetch": "^3.3.1",
+    "path": "*",
+    "pem-file": "^1.0.1",
+    "pem-ts": "^3.0.1",
+    "ts-loader": "^4.0.0"
+  },
+  "overrides": {
+    "candb-client-typescript": {
+      "@dfinity/agent": "^0.15.5",
+      "@dfinity/candid": "^0.15.5",
+      "@dfinity/identity": "^0.15.5",
+      "@dfinity/principal": "^0.15.5"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "generate-declarations": "dfx generate && ./src/scripts/comment_last_line.sh"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  }
+}

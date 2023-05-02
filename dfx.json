@@ -1,0 +1,36 @@
+{
+  "canisters": {
+    "candb_index": {
+      "main": "src/canisters/candb_index.mo",
+      "type": "motoko"
+    },
+    "candb_service": {
+      "main": "src/canisters/candb_service.mo",
+      "type": "motoko"
+    },
+    "main": {
+      "main": "src/canisters/main.mo",
+      "type": "motoko"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": "vessel sources"
+    }
+  },
+  "networks": {
+    "local": {
+        "bind": "127.0.0.1:8080",
+        "type": "ephemeral"
+    }
+  },
+  "declarations": {
+    "output": "src/declarations",
+    "capabilities": [
+      "nodejs"
+    ]
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
