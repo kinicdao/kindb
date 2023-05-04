@@ -13,6 +13,7 @@ import Buffer "mo:base/Buffer";
 import Debug "mo:base/Debug";
 import Principal "mo:base/Principal";
 import Error "mo:base/Error";
+import Array "mo:base/Array";
 
 import LexEncode "mo:lexicographic-encoding/EncodeInt";
 import JSON "mo:json/JSON";
@@ -812,6 +813,16 @@ func batchInsert(inputJsonText: Text): async () {
       output := output # r.sk # "\n";
     };
     output
+  };
+  public query func getOwners(): async ?[Text] {
+    switch (owners) {
+      case (?owners) {
+        ?Array.map<Principal, Text>(owners, func(o) {
+          Principal.toText(o)
+        });
+      };
+      case null return null;
+    }
   };
 
 }

@@ -22,3 +22,6 @@ node_modules/
 # data
 kinicDB.json
 test/
+
+# ic-repl
+.history
