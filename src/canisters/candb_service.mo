@@ -797,10 +797,13 @@ func batchInsert(inputJsonText: Text): async () {
     ignore CanDB.update(db, {sk=metadataSk; updateAttributeMapFunction});
   };
 
-  public query func debug_searchBySk(sk: Text): async ?Entity.Entity {
+  public shared query({caller=caller}) func debug_searchBySk(sk: Text): async ?Entity.Entity {
+    if (not isOwner(caller)) throw Error.reject("not authorized");
     CanDB.get(db, {sk});
   };
-  public query func debug_show_all(): async Text {
+  
+  public shared query({caller=caller}) func debug_show_all(): async Text {
+    if (not isOwner(caller)) throw Error.reject("not authorized");
     let rs = CanDB.scan(db, {
       skLowerBound = "#";
       skUpperBound = "#~";
