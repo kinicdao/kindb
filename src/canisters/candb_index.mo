@@ -83,7 +83,8 @@ shared ({ caller = initial_owner })  actor class IndexCanister() = this {
   };
 
   // Spins up a new Service canister with the provided pk and controllers
-  func createServiceCanister(pk: Text, controllers: ?[Principal]): async Text {
+  public shared({caller = caller}) func createServiceCanister(pk: Text, controllers: ?[Principal]): async Text {
+    if (Principal.isAnonymous(caller) or caller != owner) throw Error.reject("not authorized");
     Debug.print("creating new service canister with pk=" # pk);
     // Pre-load 300 billion cycles for the creation of a new Service canister
     // Note that canister creation costs 100 billion cycles, meaning there are 200 billion

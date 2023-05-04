@@ -10,7 +10,7 @@ async function test_upload(serviceCanisterId, identityName, dataPath) {
   const identity = importIdentity(identityName);
   const agent = new HttpAgent({
     identity: identity,
-    host: "http://127.0.0.1:8080",
+    host: "https://ic0.app",
     fetch,
   });
   const serviceActor = ServiceCreateActor(serviceCanisterId, {agent})
