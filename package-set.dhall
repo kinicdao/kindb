@@ -12,8 +12,8 @@ let packages = [
   , dependencies = [ "base" ]
   },
   { name = "candb"
-  , repo = "git@github.com:canscale/CanDB.git"
-  , version = "d982b587bdfb888855af25d7cd7531e012669c0d"
+  , repo = "https://github.com/canscale/CanDB"
+  , version = "beta"
   , dependencies = [ "base" ]
   },
   { name = "btree"
