@@ -248,7 +248,7 @@ shared ({ caller = owner }) actor class Service({
           case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text term_lowcase)) break FindTerm;
           case _ {};
         };
-        switch(Entity.getAttributeMapValueForKey(entity.attributes, "subtilte")) {
+        switch(Entity.getAttributeMapValueForKey(entity.attributes, "subtitle")) {
           case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text term_lowcase)) break FindTerm;
           case _ {};
         };
