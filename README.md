@@ -4,9 +4,9 @@
 
     `dfx start --clean --background`
 
-1. Deploy index canister & Create service canister by PK: test from index canister
+1. Deploy index canister & Create service canister by PK:"kinicdb" from index canister. owners are index canister and installer of it. If you want to add more owners, you can add them by `vec {<extra prinicpals>}`
 
-    `dfx deploy candb_index && dfx canister call candb_index createServiceCanisterByPk '("test")'`
+    `dfx deploy candb_index && dfx canister call candb_index createServiceCanisterByPk '("kinicdb", vec {principal <extra prinicpals>; principal <extra prinicpals>;})'`
 
 1. Generate candid types
 
@@ -50,3 +50,26 @@ For Web Client
 
     Usage:  `searchCanisterId(<CanisterId>)`
     Return: `(<JSON_TEXT>)`
+
+
+### How add controllers to service canisters
+
+1. add controller by dfx command
+
+    `dfx canister update-settings nw5jb-vqaaa-aaaaf-qaj4a-cai --add-controller SOMTHINGHERERER`
+
+1. add them as owner
+    - `dfx build candb_service`
+
+    - `export DFX_USER=$(dfx identity whoami)`
+
+    - `ic-repl`
+
+    - \> `identity user "~/.config/dfx/identity/$DFX_USER/identity.pem"`
+
+    - \> `import index = "<index canister id>"`
+
+    - \> `let wasm = file(".dfx/local/canisters/candb_service/candb_service.wasm")`
+
+    - \> `call index.upgradeServiceCanisterByPk("knicdb", wasm, vec {principal "<extra owner id>"})`
+

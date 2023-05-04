@@ -67,6 +67,8 @@ shared ({ caller = owner }) actor class Service({
     };
     result
   };
+
+  
   Debug.print "Hi, I'm upgraded!";
   
   /*
