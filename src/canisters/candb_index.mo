@@ -43,6 +43,15 @@ shared ({ caller = initial_owner })  actor class IndexCanister() = this {
 
   stable var owner = initial_owner;
 
+  public shared({caller = caller}) func changeOwner(newOnwer : Text): async () {
+    if (Principal.isAnonymous(caller) or caller != owner) throw Error.reject("not authorized");
+    owner := Principal.fromText(newOnwer);
+  };
+
+  public shared query func getOwner(): async Text {
+    Principal.toText(owner)
+  };
+
   public shared({caller = caller}) func autoScaleServiceCanister(pk: Text): async Text {
     // Auto-Scaling Authorization - if the request to auto-scale the partition does not coming from an existing canister in the partition, reject it.
     if (Utils.callingCanisterOwnsPK(caller, pkToCanisterMap, pk)) {
