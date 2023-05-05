@@ -68,7 +68,7 @@ shared ({ caller = owner }) actor class Service({
     result
   };
 
-  
+
   Debug.print "Hi, I'm upgraded!";
   
   /*
@@ -239,6 +239,9 @@ shared ({ caller = owner }) actor class Service({
   // SELECT * FROM canisters WHERE type = 'app' AND (title ILIKE '%" + newCat + "%' OR content ILIKE '%" + newCat + "%' OR subtitle ILIKE '%" + newCat + "%') LIMIT 300;
   public query func searchTerm(term: Text, startSK: ?Text): async (Text, ?Text) {
     let limit = 300;
+    return scanTerm(term, null, limit)
+  };
+  func scanTerm(term: Text, startSK: ?Text, limit: Nat): (Text, ?Text) {
     let scanResult = CanDB.scan(db, termScanOptions(limit, startSK));
     let buffer = Buffer.Buffer<JSON.JSON>(limit); // WIP limit
     let term_lowcase = Text.map(term , Prim.charToLower);
@@ -263,6 +266,27 @@ shared ({ caller = owner }) actor class Service({
       buffer.add(attributeMapToJsonByKeys(entity.attributes, JsonKeys));
     };
     return (JSON.show(#Array(Buffer.toArray(buffer))), scanResult.nextKey);
+  };
+
+  public query func searchTermWithNextKeysForParallelSearch(term: Text): async (Text, [Text]) {
+    let size: Nat = (db.count/4)+1; // there are 4 bucket. (canisterSk, termSk, titleSk, lastseenSk)
+    let sks = Buffer.Buffer<Text>(size);
+    let limit = 300;
+
+    let (res, firstNk) = scanTerm(term, null, limit);
+
+    var nextKey = firstNk;
+    label Loop loop{
+      switch (nextKey) {
+        case (?nk) {
+          sks.add(nk);
+          nextKey := (CanDB.scan(db, termScanOptions(limit, ?nk))).nextKey;
+        };
+        case null break Loop;
+      };
+    };
+
+    return (res, Buffer.toArray(sks))
   };
 
   // searchID #THIS TAKES THE ID AND RETURNS ONE THING

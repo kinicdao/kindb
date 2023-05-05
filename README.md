@@ -63,7 +63,7 @@ For Web Client
 
     - `export DFX_USER=$(dfx identity whoami)`
 
-    - `ic-repl`
+    - `ic-repl -r https://ic0.app`
 
     - \> `identity user "~/.config/dfx/identity/$DFX_USER/identity.pem"`
 
