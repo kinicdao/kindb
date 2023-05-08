@@ -5,28 +5,46 @@ import { importIdentity } from "./loadpem.js";
 import { createActor as ServiceCreateActor } from "../../declarations/candb_service/index.js"; // Need to commentout "export const main = createActor(canisterId);" in this file.
 import fs from 'fs';
 
-async function searchTermLoop_(term) {
-  let res = await serviceActor.searchTermWithNextKeysForParallelSearch(term)
+async function searchTermLoop_(term1, term2) {
+  let res = await serviceActor.searchTermWithNextKeysForParallelSearch(term1)
+  let res2 = await serviceActor.searchTermWithTarget(true, true, true, [term2], [])
 
-  let promises = []
+  const INIT = 0;
+  const MAX = res[1].length;
+  const CONCURRENCY = 10; // 同時実行できる数を定義
+  console.log("Max", MAX)
+  let cnt1 = INIT;
+  let cnt2 = INIT;
+  let promises = [];
 
-  for (let sk of res[1]) {
-    promises.push(query_data(term, sk))
+  for (let i = 0; i < CONCURRENCY; i++) {
+    let p = new Promise((resolve) => {
+      (async function loop(index1, index2) {
+        console.log(index1, index2)
+        if (index1 < MAX) {
+          await query_data(true, true, false, term1, [res[1][index1]]);
+          loop(cnt1++, cnt2);
+          return;
+        }
+        else if (index2 < MAX) {
+          await query_data(true, true, true, term2, [res[1][index2]]);
+          loop(cnt1, cnt2++);
+          return;
+        }
+        resolve();
+      })(cnt1++, cnt2);
+    });
+    promises.push(p);
   }
 
-  await Promise.all(promises).then((values) => {
-    // console.log(values)
-  });
+  await Promise.all(promises);
 
 };
 
-async function query_data(term, sk) {
+async function query_data(title, subtitle, content, term, sk) {
   return new Promise(async (resolve) => {
-    let begin = new Date()
-    // console.log("begin: ",sk, begin)
-    let res = await serviceActor.searchTerm(term, [sk])
-    // console.log(res[1][0], new Date() - begin)
-    // console.log("time: ",sk, new Date() - begin)
+    let res = await serviceActor.searchTermWithTarget(title, subtitle, content, [term], sk)
+    if (res[0] != '[]') console.log("get")
     resolve(res)
   });
 }
@@ -50,10 +68,12 @@ async function query_data(term, sk) {
 //   console.log(res[0])
 // }
 
-if (process.argv.length != 4) throw "uploader.js <service canisterid>"
+if (process.argv.length != 5) throw "uploader.js <service canisterid>"
 let serviceCanisterId = process.argv[2]
-let term = process.argv[3]
+let term1 = process.argv[3]
+let term2 = process.argv[4]
 console.log("canisterid = " + serviceCanisterId)
+console.log(term1, term2)
 
 const agent = new HttpAgent({
   // host: "https://ic0.app",
@@ -62,4 +82,4 @@ const agent = new HttpAgent({
 });
 const serviceActor = ServiceCreateActor(serviceCanisterId, {agent})
 
-searchTermLoop_(term)
+searchTermLoop_(term1, term2)

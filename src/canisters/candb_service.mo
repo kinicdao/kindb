@@ -15,6 +15,7 @@ import Principal "mo:base/Principal";
 import Error "mo:base/Error";
 import Array "mo:base/Array";
 import Time "mo:base/Time";
+import Float "mo:base/Float";
 
 import LexEncode "mo:lexicographic-encoding/EncodeInt";
 import JSON "mo:json/JSON";
@@ -243,79 +244,41 @@ shared ({ caller = owner }) actor class Service({
   public query func searchTerm(term: Text, startSK: ?Text): async (Text, ?Text) {
     let limit = SearchTermLimit;
     // return scanTerm(term, words, startSK, limit)
-    return scanTerm(term, startSK, limit)
+    return scanTerm({title=true; subtitle=true; content=true}, [term], startSK, limit)
   };
 
+  public query func searchTermWithTarget(title: Bool, subtitle: Bool, content: Bool, words: [Text], startSK: ?Text): async (Text, ?Text) {
+    let limit = SearchTermLimit;
+    // return scanTerm(term, words, startSK, limit)
+    return scanTerm({title; subtitle; content}, words, startSK, limit)
+  };
 
-  // func scanTerm(term: Text, words: [Text], startSK: ?Text, limit: Nat): (Text, ?Text) {
-  func scanTerm(term: Text, startSK: ?Text, limit: Nat): (Text, ?Text) {
-    // let start_time = Time.now();
-    // Debug.print("start: "# debug_show(startSK)  # debug_show(start_time) );
-    let scanResult = CanDB.scan(db, termScanOptions(limit, startSK));
-    let buffer = Buffer.Buffer<JSON.JSON>(limit); // WIP limit
-    let term_lowcase = Text.map(term , Prim.charToLower);
-    // let words_lowcase = Array.map<Text, Text>(words, func(w) {Text.map(w , Prim.charToLower)});
-    label SearchLoop for (entity in scanResult.entities.vals()) {
+  public query func getNextKeysForParallelSearchTerm(): async ([Text]) {
+    let size: Nat = (db.count/4)+1; // there are 4 bucket. (canisterSk, termSk, titleSk, lastseenSk)
+    let sks = Buffer.Buffer<Text>(size);
+    let limit = SearchTermLimit;
 
-      // For case-sensitive hits, use Text.map(text , Prim.charToLower)
-      label FindTerm {
-        switch(Entity.getAttributeMapValueForKey(entity.attributes, "title")) {
-          case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text term_lowcase)) break FindTerm;
-          case _ {};
+    var nextKey = (CanDB.scan(db, termScanOptions(limit, null))).nextKey;
+    label Loop loop{
+      switch (nextKey) {
+        case (?nk) {
+          sks.add(nk);
+          nextKey := (CanDB.scan(db, termScanOptions(limit, ?nk))).nextKey;
         };
-        switch(Entity.getAttributeMapValueForKey(entity.attributes, "subtitle")) {
-          case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text term_lowcase)) break FindTerm;
-          case _ {};
-        };
-        switch(Entity.getAttributeMapValueForKey(entity.attributes, "content")) {
-          case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text term_lowcase)) break FindTerm;
-          case _ {};
-        };
-
-
-        // var hitInTitle = 0;
-        // for (word in words_lowcase.vals()) {
-        //   switch(Entity.getAttributeMapValueForKey(entity.attributes, "title")) {
-        //     case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text word)) hitInTitle += 1;
-        //     case _ {};
-        //   };
-        // };
-        // if (hitInTitle >= (words.size())/2) break FindTerm; // If the majority hit
-
-        // var hitInSubtitle = 0;
-        // for (word in words_lowcase.vals()) {
-        //   switch(Entity.getAttributeMapValueForKey(entity.attributes, "subtitle")) {
-        //     case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text word)) hitInSubtitle += 1;
-        //     case _ {};
-        //   };
-        // };
-        // if (hitInSubtitle >= (words.size())/2) break FindTerm; // If the majority hit
-
-        // var hitInContent = 0;
-        // for (word in words_lowcase.vals()) {
-        //   switch(Entity.getAttributeMapValueForKey(entity.attributes, "content")) {
-        //     case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text word)) hitInContent += 1;
-        //     case _ {};
-        //   };
-        // };
-        // if (hitInContent >= (words.size())/2) break FindTerm; // If the majority hit
-
-        continue SearchLoop; // No hit, goto next.
+        case null break Loop;
       };
-      buffer.add(attributeMapToJsonByKeys(entity.attributes, JsonKeys));
     };
-    // Debug.print("end  : " # debug_show(startSK)  # debug_show(Time.now()-start_time) );
-    return (JSON.show(#Array(Buffer.toArray(buffer))), scanResult.nextKey);
+
+    return Buffer.toArray(sks)
   };
 
-  // public query func searchTermWithNextKeysForParallelSearch(term: Text, words: [Text]): async (Text, [Text]) {
   public query func searchTermWithNextKeysForParallelSearch(term: Text): async (Text, [Text]) {
     let size: Nat = (db.count/4)+1; // there are 4 bucket. (canisterSk, termSk, titleSk, lastseenSk)
     let sks = Buffer.Buffer<Text>(size);
     let limit = SearchTermLimit;
 
     // let (res, firstNk) = scanTerm(term, words, null, limit);
-    let (res, firstNk) = scanTerm(term, null, limit);
+    let (res, firstNk) = scanTerm({title=true; subtitle=true; content=true}, [term], null, limit);
 
     var nextKey = firstNk;
     label Loop loop{
@@ -330,6 +293,76 @@ shared ({ caller = owner }) actor class Service({
 
     return (res, Buffer.toArray(sks))
   };
+
+  type SearchTarget = {
+    title: Bool;
+    subtitle: Bool;
+    content: Bool;
+  };
+
+  // func scanTerm(term: Text, words: [Text], startSK: ?Text, limit: Nat): (Text, ?Text) {
+  func scanTerm(target: SearchTarget, words: [Text], startSK: ?Text, limit: Nat): (Text, ?Text) {
+    let scanResult = CanDB.scan(db, termScanOptions(limit, startSK));
+    let buffer = Buffer.Buffer<JSON.JSON>(limit); // WIP limit
+    let words_lowcase = Array.map<Text, Text>(words, func(word) {Text.map(word, Prim.charToLower)});
+    label SearchLoop for (entity in scanResult.entities.vals()) {
+
+      // For case-sensitive hits, use Text.map(text , Prim.charToLower)
+      label FindTerm {
+        // switch(Entity.getAttributeMapValueForKey(entity.attributes, "title")) {
+        //   case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text term_lowcase)) break FindTerm;
+        //   case _ {};
+        // };
+        // switch(Entity.getAttributeMapValueForKey(entity.attributes, "subtitle")) {
+        //   case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text term_lowcase)) break FindTerm;
+        //   case _ {};
+        // };
+        // switch(Entity.getAttributeMapValueForKey(entity.attributes, "content")) {
+        //   case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text term_lowcase)) break FindTerm;
+        //   case _ {};
+        // };
+
+        if (target.title) {
+          var hitInTitle: Float = 0;
+          for (word in words_lowcase.vals()) {
+            switch(Entity.getAttributeMapValueForKey(entity.attributes, "title")) {
+              case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text word)) hitInTitle += 1;
+              case _ {};
+            };
+          };
+          if (hitInTitle >= Float.fromInt(words.size())/2.0) break FindTerm; // If the majority hit
+        };
+
+        if (target.subtitle) {
+          var hitInSubtitle: Float = 0;
+          for (word in words_lowcase.vals()) {
+            switch(Entity.getAttributeMapValueForKey(entity.attributes, "subtitle")) {
+              case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text word)) hitInSubtitle += 1;
+              case _ {};
+            };
+          };
+          if (hitInSubtitle >= Float.fromInt(words.size())/2.0) break FindTerm; // If the majority hit
+        };
+
+        if (target.content) {
+          var hitInContent: Float = 0;
+          for (word in words_lowcase.vals()) {
+            switch(Entity.getAttributeMapValueForKey(entity.attributes, "content")) {
+              case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text word)) hitInContent += 1;
+              case _ {};
+            };
+          };
+          if (hitInContent >= Float.fromInt(words.size())/2.0) break FindTerm; // If the majority hit
+        };
+
+        continue SearchLoop; // No hit, goto next.
+      };
+      buffer.add(attributeMapToJsonByKeys(entity.attributes, JsonKeys));
+    };
+    // Debug.print("end  : " # debug_show(startSK)  # debug_show(Time.now()-start_time) );
+    return (JSON.show(#Array(Buffer.toArray(buffer))), scanResult.nextKey);
+  };
+
 
   // searchID #THIS TAKES THE ID AND RETURNS ONE THING
   // select * from canisters where type = 'app' AND canisterid = $1 LIMIT 1
