@@ -13,7 +13,7 @@ async function searchTermLoop_(serviceCanisterId, term) {
     fetch,
   });
   const serviceActor = ServiceCreateActor(serviceCanisterId, {agent})
-  let res = await loopUntilGet(serviceActor.searchTerm)
+  let res = await searchUntilGet(serviceActor.searchTerm, term)
   console.log(res)
 };
 
