@@ -14,6 +14,7 @@ import Debug "mo:base/Debug";
 import Principal "mo:base/Principal";
 import Error "mo:base/Error";
 import Array "mo:base/Array";
+import Time "mo:base/Time";
 
 import LexEncode "mo:lexicographic-encoding/EncodeInt";
 import JSON "mo:json/JSON";
@@ -237,14 +238,23 @@ shared ({ caller = owner }) actor class Service({
   // If there are no results we search again 
   // newCat := longestWord(term)
   // SELECT * FROM canisters WHERE type = 'app' AND (title ILIKE '%" + newCat + "%' OR content ILIKE '%" + newCat + "%' OR subtitle ILIKE '%" + newCat + "%') LIMIT 300;
+  let SearchTermLimit = 300;
+  // public query func searchTerm(term: Text, words: [Text], startSK: ?Text): async (Text, ?Text) {
   public query func searchTerm(term: Text, startSK: ?Text): async (Text, ?Text) {
-    let limit = 300;
-    return scanTerm(term, null, limit)
+    let limit = SearchTermLimit;
+    // return scanTerm(term, words, startSK, limit)
+    return scanTerm(term, startSK, limit)
   };
+
+
+  // func scanTerm(term: Text, words: [Text], startSK: ?Text, limit: Nat): (Text, ?Text) {
   func scanTerm(term: Text, startSK: ?Text, limit: Nat): (Text, ?Text) {
+    // let start_time = Time.now();
+    // Debug.print("start: "# debug_show(startSK)  # debug_show(start_time) );
     let scanResult = CanDB.scan(db, termScanOptions(limit, startSK));
     let buffer = Buffer.Buffer<JSON.JSON>(limit); // WIP limit
     let term_lowcase = Text.map(term , Prim.charToLower);
+    // let words_lowcase = Array.map<Text, Text>(words, func(w) {Text.map(w , Prim.charToLower)});
     label SearchLoop for (entity in scanResult.entities.vals()) {
 
       // For case-sensitive hits, use Text.map(text , Prim.charToLower)
@@ -261,18 +271,50 @@ shared ({ caller = owner }) actor class Service({
           case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text term_lowcase)) break FindTerm;
           case _ {};
         };
+
+
+        // var hitInTitle = 0;
+        // for (word in words_lowcase.vals()) {
+        //   switch(Entity.getAttributeMapValueForKey(entity.attributes, "title")) {
+        //     case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text word)) hitInTitle += 1;
+        //     case _ {};
+        //   };
+        // };
+        // if (hitInTitle >= (words.size())/2) break FindTerm; // If the majority hit
+
+        // var hitInSubtitle = 0;
+        // for (word in words_lowcase.vals()) {
+        //   switch(Entity.getAttributeMapValueForKey(entity.attributes, "subtitle")) {
+        //     case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text word)) hitInSubtitle += 1;
+        //     case _ {};
+        //   };
+        // };
+        // if (hitInSubtitle >= (words.size())/2) break FindTerm; // If the majority hit
+
+        // var hitInContent = 0;
+        // for (word in words_lowcase.vals()) {
+        //   switch(Entity.getAttributeMapValueForKey(entity.attributes, "content")) {
+        //     case (?#text v) if (Text.contains(Text.map(v , Prim.charToLower), #text word)) hitInContent += 1;
+        //     case _ {};
+        //   };
+        // };
+        // if (hitInContent >= (words.size())/2) break FindTerm; // If the majority hit
+
         continue SearchLoop; // No hit, goto next.
       };
       buffer.add(attributeMapToJsonByKeys(entity.attributes, JsonKeys));
     };
+    // Debug.print("end  : " # debug_show(startSK)  # debug_show(Time.now()-start_time) );
     return (JSON.show(#Array(Buffer.toArray(buffer))), scanResult.nextKey);
   };
 
+  // public query func searchTermWithNextKeysForParallelSearch(term: Text, words: [Text]): async (Text, [Text]) {
   public query func searchTermWithNextKeysForParallelSearch(term: Text): async (Text, [Text]) {
     let size: Nat = (db.count/4)+1; // there are 4 bucket. (canisterSk, termSk, titleSk, lastseenSk)
     let sks = Buffer.Buffer<Text>(size);
-    let limit = 300;
+    let limit = SearchTermLimit;
 
+    // let (res, firstNk) = scanTerm(term, words, null, limit);
     let (res, firstNk) = scanTerm(term, null, limit);
 
     var nextKey = firstNk;
