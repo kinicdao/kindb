@@ -1,7 +1,7 @@
 // See https://forum.dfinity.org/t/using-dfinity-agent-in-node-js/6169/55
 
 import { Actor, HttpAgent } from "@dfinity/agent";
-import { importIdentity } from "./loadpem.js";
+import { importIdentity } from "../upload/loadpem.js";
 import { createActor as ServiceCreateActor } from "../../declarations/candb_service/index.js"; // Need to commentout "export const main = createActor(canisterId);" in this file.
 import fs from 'fs';
 
