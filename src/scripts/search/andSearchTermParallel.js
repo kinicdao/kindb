@@ -7,7 +7,7 @@ import fs from 'fs';
 
 async function searchTermLoop_(terms) {
   // let res = JSON.parse(fs.readFileSync("./test/sks.json", 'utf8'))
-  let res = await serviceActor.searchTermWithNextKeysForParallelSearch(terms.split(" "))
+  let res = await serviceActor.searchTermForParallel(terms.split(" "))
 
   console.log(terms.split(" "))
 

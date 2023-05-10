@@ -247,6 +247,28 @@ shared ({ caller = owner }) actor class Service({
     return scanTerm({title=true; subtitle=true; content=true}, [term], startSK, limit)
   };
 
+  public query func searchTermForParallel(terms: [Text]): async (Text, [Text]) {
+    let size: Nat = (db.count/4)+1; // there are 4 bucket. (canisterSk, termSk, titleSk, lastseenSk)
+    let sks = Buffer.Buffer<Text>(size);
+    let limit = SearchTermLimit;
+
+    // let (res, firstNk) = scanTerm(term, words, null, limit);
+    let (res, firstNk) = scanTerm({title=true; subtitle=true; content=true}, terms, null, limit);
+
+    var nextKey = firstNk;
+    label Loop loop{
+      switch (nextKey) {
+        case (?nk) {
+          sks.add(nk);
+          nextKey := (CanDB.scan(db, termScanOptions(limit, ?nk))).nextKey;
+        };
+        case null break Loop;
+      };
+    };
+
+    return (res, Buffer.toArray(sks))
+  };
+
   public query func searchTermWithTarget(title: Bool, subtitle: Bool, content: Bool, words: [Text], startSK: ?Text): async (Text, ?Text) {
     let limit = SearchTermLimit;
     // return scanTerm(term, words, startSK, limit)
@@ -272,13 +294,13 @@ shared ({ caller = owner }) actor class Service({
     return Buffer.toArray(sks)
   };
 
-  public query func searchTermWithNextKeysForParallelSearch(terms: [Text]): async (Text, [Text]) {
+  public query func searchTermWithNextKeysForParallelSearch(term: Text): async (Text, [Text]) {
     let size: Nat = (db.count/4)+1; // there are 4 bucket. (canisterSk, termSk, titleSk, lastseenSk)
     let sks = Buffer.Buffer<Text>(size);
     let limit = SearchTermLimit;
 
     // let (res, firstNk) = scanTerm(term, words, null, limit);
-    let (res, firstNk) = scanTerm({title=true; subtitle=true; content=true}, terms, null, limit);
+    let (res, firstNk) = scanTerm({title=true; subtitle=true; content=true}, [term], null, limit);
 
     var nextKey = firstNk;
     label Loop loop{
