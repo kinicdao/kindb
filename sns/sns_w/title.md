@@ -1,1 +1,1 @@
-Kinic DAO - Proposal to enable principal dl4qi-ihmtt-ug3sl-bnick-g4c2c-kmux5-whva5-mtdst-pbbmh-vkcpf-bae in SNS-W to initiate the generation of an SNS for Kinic
+Kinic DAO - Proposal to enable principal kavk3-oyaaa-aaaao-ajihq-cai in SNS-W to initiate the generation of an SNS for Kinic
