@@ -28,3 +28,4 @@ test/
 
 # build
 build/outputs/*
+!build/outputs/.gitkeep

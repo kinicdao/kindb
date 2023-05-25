@@ -45,7 +45,7 @@ alias run_compile="limactl shell intel_on_arm_with_nerdctl nerdctl run --platfor
                     -v $(pwd)/vessel.dhall:/project_root/vessel.dhall \
                     -v $(pwd)/package-set.dhall:/project_root/package-set.dhall \
                     reproducible_kindb_builds \
-                    ./build/build.sh"
+                    bash ./build/build.sh"
 
 alias run_reprotest="limactl shell intel_on_arm_with_nerdctl nerdctl run --platform=amd64 --rm --privileged \
                     -v $(pwd)/src/canisters:/project_root/canisters \
@@ -53,28 +53,28 @@ alias run_reprotest="limactl shell intel_on_arm_with_nerdctl nerdctl run --platf
                     -v $(pwd)/vessel.dhall:/project_root/vessel.dhall \
                     -v $(pwd)/package-set.dhall:/project_root/package-set.dhall \
                     reproducible_kindb_builds \
-                    ./build/reprotest.sh"
+                    bash ./build/reprotest.sh"
 ```
 
 For Intel chip 🖥 
 ```bash
 alias build_image="docker build -t reproducible_kindb_builds build/"
 
-alias run_compile="docker run --platform=amd64 --rm \
+alias run_compile="docker run --rm \
                     -v $(pwd)/src/canisters:/project_root/canisters \
                     -v $(pwd)/build:/project_root/build \
                     -v $(pwd)/vessel.dhall:/project_root/vessel.dhall \
                     -v $(pwd)/package-set.dhall:/project_root/package-set.dhall \
                     reproducible_kindb_builds \
-                    ./build/build.sh"
+                    bash ./build/build.sh"
 
-alias run_reprotest="docker run --platform=amd64 --rm --privileged \
+alias run_reprotest="docker run --rm --privileged \
                     -v $(pwd)/src/canisters:/project_root/canisters \
                     -v $(pwd)/build:/project_root/build \
                     -v $(pwd)/vessel.dhall:/project_root/vessel.dhall \
                     -v $(pwd)/package-set.dhall:/project_root/package-set.dhall \
                     reproducible_kindb_builds \
-                    ./build/reprotest.sh"
+                    bash ./build/reprotest.sh"
 ```
 
 ### 🛠 Build Wasm Binary

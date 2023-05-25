@@ -1,3 +1,7 @@
 #! /bin/sh
 
-reprotest -vv --variations '+all, -domain_host' '/project_root/build/build.sh' 'build/outputs/*.wasm'
+vessel install
+reprotest  -vv --variations '+all, -domain_host, -locales' 'bash build/build.sh && ls -la ./build/outputs' 'build/outputs/main.wasm'
+
+
+# "+environment, +build_path, +kernel, +aslr, +num_cpus, +time, +user_group, +fileordering, +domain_host, +home, +locales, +exec_path, +timezone, +umask"
