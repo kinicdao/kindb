@@ -25,3 +25,6 @@ test/
 
 # ic-repl
 .history
+
+# build
+build/outputs/*
