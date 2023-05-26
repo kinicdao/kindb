@@ -2,7 +2,7 @@
 # Reproducible Canister Builds
 For more information, see this [page](https://internetcomputer.org/docs/current/developer-docs/backend/reproducible-builds) on DFINITY.
 ## Setup Container
-if you are using Apple silicon Mac, ou need to install lima in order to build on x86_64.  
+if you are using Apple silicon Mac, you need to install lima in order to build on x86_64.  
 if you are using Intel chip Mac or WSL or Linuc, skip to [[🛠 Make alias]](#🛠-make-alias)
 
 ### 🛠 Install Lima
