@@ -25,3 +25,7 @@ test/
 
 # ic-repl
 .history
+
+# build
+build/outputs/*
+!build/outputs/.gitkeep
