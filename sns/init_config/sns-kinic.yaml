@@ -187,6 +187,24 @@ initial_voting_period_seconds: 86400 # 24 hours
 wait_for_quiet_deadline_increase_seconds: 43200 # 12 hours
 #
 #
+# SNS SWAP
+#
+# An optional text that swap participants should confirm before they may
+# participate in the swap. If the field is set, its value should be plain text
+# with at least 1 and at most 1,000 characters.
+#
+# Example: "Please confirm that 2+2=4"
+#
+confirmation_text: "Any person that purchases, holds, owns, or otherwise directly or indirectly controls or benefits from one or more KINIC tokens (a “Tokenholder”) acknowledges that they have read the Kinic white paper in it’s entirety, and have fully understood and agree to section 7. ‘Token Holder Rights and Limitations’. Please confirm that you have read the white paper and agree to follow its content."
+#
+# An optional set of countries that should not participate in the swap. If the
+# field is set, it must contain (upper case) ISO 3166-1 alpha-2 country codes.
+#
+# Example: ["CH", "FR"]
+#
+restricted_countries: ["US"]
+#
+#
 # SNS INITIAL TOKEN DISTRIBUTION
 #
 # This field sets the initial token distribution. Initially, there is only support for
