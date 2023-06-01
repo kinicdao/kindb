@@ -162,7 +162,7 @@ fallback_controller_principal_ids: [dl4qi-ihmtt-ug3sl-bnick-g4c2c-kmux5-whva5-mt
 # 
 # The default value is 345600 seconds (4 days).
 #
-initial_voting_period_seconds: 345600 # Default
+initial_voting_period_seconds: 86400 # 24 hours
 #
 # The wait for quiet algorithm extends the voting period of a proposal when
 # there is a flip in the majority vote during the proposal's voting period.
@@ -184,7 +184,7 @@ initial_voting_period_seconds: 345600 # Default
 #
 # The default value is 86400 seconds (1 day).
 #
-wait_for_quiet_deadline_increase_seconds: 86400 # Default
+wait_for_quiet_deadline_increase_seconds: 43200 # 12 hours
 #
 #
 # SNS INITIAL TOKEN DISTRIBUTION
