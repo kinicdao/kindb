@@ -30,3 +30,7 @@ test/
 bin
 sns/proposal_msg
 sns/init_config/sns_wasms
+
+# build
+build/outputs/*
+!build/outputs/.gitkeep

@@ -3,7 +3,7 @@ import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
 import CanDB "mo:candb/CanDB";
 
-import Index "candb_index";
+// import Index "candb_index";
 
 actor {
   public query func greet(name : Text) : async Text {

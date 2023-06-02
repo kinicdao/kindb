@@ -72,4 +72,3 @@ For Web Client
     - \> `let wasm = file(".dfx/local/canisters/candb_service/candb_service.wasm")`
 
     - \> `call index.upgradeServiceCanisterByPk("knicdb", wasm, vec {principal "<extra owner id>"})`
-
