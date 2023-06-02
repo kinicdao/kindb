@@ -4,6 +4,6 @@ identity user "~/.config/dfx/identity/$DFX_USER/identity.pem";
 
 import index = "rrkah-fqaaa-aaaaa-aaaaq-cai";
 
-let wasm = file("build/outputs/candb_service.wasm");
+let wasm = file(".dfx/local/canisters/candb_service/candb_service.wasm");
 
-call index.upgradeServiceCanisterByPk("kinicdb", wasm, vec {})
+call index.upgradeServiceCanisterByPk("kinicdb", wasm, vec {principal "zs4e3-n56gl-pz5si-uglqd-eqttc-zr5o2-gcrlk-waeha-hhjbf-qfbap-fae"})
