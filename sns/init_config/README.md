@@ -32,21 +32,14 @@
     candb_index
     ```bash
     cp build/outpus/candb_index.wasm .dfx/ic/canisters/candb_index/candb_index.wasm
-    dfx deploy --network ic candb_index
-    dfx canister --network ic info candb_index
+    dfx deploy --network ic $CANDB_INDEX_PID
+    dfx canister --network ic info $CANDB_INDEX_PID
     ```
 
     candb_service
     ```bash
     upgradeServiceCanisterCall.sh
     dfx canister --network ic info $CANDB_SERVICE_PID
-    ```
-    
-    main
-    ```bash
-    cp build/outpus/main.wasm .dfx/ic/canisters/main/main.wasm
-    dfx deploy --network ic candb_index
-    dfx canister --network ic info candb_index
     ```
 
 ## Deploy SNS canisters
@@ -105,9 +98,6 @@
 ## Register dapps
 
 1. Update controllers
-
-    **Warning**
-    Ensure current dapp hash module and reproducible builds hash are same
 
     candb_index
     ```bash
