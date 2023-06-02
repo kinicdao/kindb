@@ -1,11 +1,8 @@
 
 # How to Setup OpenSale
 
-## Reproducible build canisters and deploy it
+## Set environment
 
-take a look reproducible_builds branch
-
-## Deploy SNS canisters
 1. Set environment
 
     ```bash
@@ -25,6 +22,34 @@ take a look reproducible_builds branch
 
     export CANISTER_IDS_PATH=".dfx/ic/canister_ids.json"
     ```
+
+## Reproducible build canisters and deploy it
+
+1. Compile binaries with reproducible builds
+
+1. Upgrade candb_index
+
+    candb_index
+    ```bash
+    cp build/outpus/candb_index.wasm .dfx/ic/canisters/candb_index/candb_index.wasm
+    dfx deploy --network ic candb_index
+    dfx canister --network ic info candb_index
+    ```
+
+    candb_service
+    ```bash
+    upgradeServiceCanisterCall.sh
+    dfx canister --network ic info $CANDB_SERVICE_PID
+    ```
+    
+    main
+    ```bash
+    cp build/outpus/main.wasm .dfx/ic/canisters/main/main.wasm
+    dfx deploy --network ic candb_index
+    dfx canister --network ic info candb_index
+    ```
+
+## Deploy SNS canisters
 
 1. Install tools
     1. Make bin directory
