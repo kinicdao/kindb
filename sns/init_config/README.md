@@ -13,13 +13,17 @@ take a look reproducible_builds branch
     export OS=darwin # linux or darwin, you can check uname -rs
     export PJ_ROOT=$(pwd)
     export NETWORK="ic"
+
     export DEV_PID="dl4qi-ihmtt-ug3sl-bnick-g4c2c-kmux5-whva5-mtdst-pbbmh-vkcpf-bae"
     export DEV_IDENTITY_NAME=
     export PEM_FILE="~/.config/dfx/identity/$DEV_IDENTITY_NAME/identity.pem"
-    export FRONTEND_PID=
-    export CANDB_INDEX_PID=
-    export CANDB_SERVICE_PID=
-    export MAIN_PID=
+
+    export CANDB_INDEX_PID="msqgt-mqaaa-aaaaf-qaj2a-cai"
+    export CANDB_SERVICE_PID="nw5jb-vqaaa-aaaaf-qaj4a-cai"
+    export FRONTEND_PID="74iy7-xqaaa-aaaaf-qagra-cai"
+    export MAIN_PID="ny7ej-oaaaa-aaaaf-qaj5a-cai"
+
+    export CANISTER_IDS_PATH=".dfx/ic/canister_ids.json"
     ```
 
 1. Install tools
@@ -51,14 +55,14 @@ take a look reproducible_builds branch
     1. Deploy SNS canisters and save the ids to `sns/canister_ids.json`
         
         **Warning**
-        Ensure you have enough cycles.
+        Ensure you have enough cycles. 180T cycles
 
         ```bash
         bin/sns-cli deploy \
           --network "${NETWORK}" \
           --init-config-file $PR_ROOT/sns/init_config/sns-kinic.yaml \
           --wasms-dir $PR_ROOT/sns/init_config/sns_wasms \
-          --save-to ".dfx/ic/canister_ids.json"
+          --save-to $CANISTER_IDS_PATH
         ```
     
     1. Make sns_canister_ids.json
@@ -82,7 +86,8 @@ take a look reproducible_builds branch
 
     candb_index
     ```bash
-    dfx canister --network "${NETWORK}" update-settings --set-controller $(dfx canister --network "${NETWORK}" id sns_root) candb_index
+    dfx canister --network "${NETWORK}" update-settings --set-controller $(dfx canister --network "${NETWORK}" id sns_root) $CANDB_INDEX_PID
+    dfx canister --network "${NETWORK}" info $CANDB_INDEX_PID
     ```
 
     candb_service
@@ -90,9 +95,20 @@ take a look reproducible_builds branch
     ```bash
     dfx canister --network "${NETWORK}" update-setting --add-controller $(dfx canister --network "${NETWORK}" id sns_root) $CANDB_SERVICE_PID
     dfx canister --network "${NETWORK}" update-setting --remove-controller $DEV_PID $CANDB_SERVICE_PID
+    dfx canister --network "${NETWORK}" info $CANDB_SERVICE_PID
     ```
 
     Do same for frontend and main.
+
+    ```bash
+    dfx canister --network "${NETWORK}" update-settings --set-controller $(dfx canister --network "${NETWORK}" id sns_root) $FRONTEND_PID
+    dfx canister --network "${NETWORK}" info $FRONTEND_PID
+    ```
+
+    ```bash
+    dfx canister --network "${NETWORK}" update-settings --set-controller $(dfx canister --network "${NETWORK}" id sns_root) $MAIN_PID
+    dfx canister --network "${NETWORK}" info $MAIN_PID
+    ```
 
 1. Register dapps to Kinic SNS
 
@@ -133,7 +149,7 @@ take a look reproducible_builds branch
 
         candb_index
         ```bash
-        $PJ_ROOT/sns/scripts/vote.sh 1 "y" $NEURON_ID_LIST[2]
+        $PJ_ROOT/sns/scripts/vote.sh 1 y $NEURON_ID_LIST[2]
         $PJ_ROOT/sns/scripts/vote.sh 1 y $NEURON_ID_LIST[3]
         ```
 
@@ -156,9 +172,16 @@ take a look reproducible_builds branch
         ```
     
     1. Check Status
+
+        Proposalas
+        ```bash
+        dfx canister --network "${NETWORK}" call sns_governance list_proposals '(record {include_reward_status = vec {}; limit = 0; exclude_type = vec {}; include_status = vec {};})'
+        ```
+
+        Parameters
         ```bash
         quill sns  \
           --canister-ids-file ./sns_canister_ids.json  \
-          --pem-file ~/.config/dfx/identity/$DEV_PID/identity.pem  \
+          --pem-file $PEM_FILE  \
           status
         ```
