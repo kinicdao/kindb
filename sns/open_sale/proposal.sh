@@ -7,7 +7,7 @@ export SNS_SWAP_ID="7sppf-6aaaa-aaaaq-aaata-cai"
 export DEADLINE=$(($(date +%s) + 1209600 )) # 2 weeks
 ic-admin   \
    --nns-url "https://nns.ic0.app/" propose-to-open-sns-token-swap  \
-   --proposer   \
+   --proposer $DEV_NEURON \
    --sns-token-e8s 150000000000000  \
    --min-icp-e8s 50000000000000  \
    --max-icp-e8s 150000000000000  \
