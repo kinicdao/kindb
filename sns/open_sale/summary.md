@@ -72,7 +72,7 @@ Sale participation parameters:
 - Max participation: 100,000 ICP
 - Max to be raised: 1,500,000 ICP
 - Min to be raised: 500,000 ICP
-- From Community Fund: 250,000 ICP
+- From Community Fund: 252,000 ICP
 - Min participants: 300
 - Sale due: 2 weeks
 - Sale delay: 1 day
