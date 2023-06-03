@@ -91,7 +91,7 @@
         \"ledger_canister_id\": \"$(dfx canister --network "${NETWORK}" id sns_ledger)\",
         \"root_canister_id\": \"$(dfx canister --network "${NETWORK}" id sns_root)\",
         \"swap_canister_id\": \"$(dfx canister --network "${NETWORK}" id sns_swap)\"
-        }"" > $PJ_ROOT/sns/sns_canister_ids.json
+        }" > $PJ_ROOT/sns/sns_canister_ids.json
         ```
 
 

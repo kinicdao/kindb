@@ -97,9 +97,8 @@ then it returns somthing like this
 Reproduction successful
 =======================
 No differences in ./build/outputs/*.wasm
-2e4a3c730821048bb9632e0825b8cf8c99f7e26a529440835a5027f4341d58c9  ./build/outputs/candb_index.wasm
-bfdc1b01b95c525843f85df2b37dc18b8b8cdfa0e9abc90fa38a854129118f9d  ./build/outputs/candb_service.wasm
-7b886ff22ac107953ba67694a9a531f7d0dd3a98f25595d0c7eb1a38720fec9b  ./build/outputs/main.wasm
+1b470d85643da52f6d1adbcd75fc2b37b61c22d688e1737a993d9e02ca05db03  ./build/outputs/candb_index.wasm
+86202ae0e7f5f4c80136cb956837e8edaa0e97cd95f09621b243014f481c266a  ./build/outputs/candb_service.wasm
 ```
 ---
 ### 🛠 Restart Lima Instance
