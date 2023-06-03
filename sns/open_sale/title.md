@@ -1,0 +1,1 @@
+Proposal to create an SNS-DAO for Kinic
