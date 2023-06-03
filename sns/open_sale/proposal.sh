@@ -21,5 +21,4 @@ ic-admin   \
    --neuron-basket-dissolve-delay-interval-seconds 7889400  \
    --sale-delay-seconds 86400 \
    --proposal-title "$(cat ./sns/open_sale/title.md)"  \
-   --summary "$(cat ./sns/open_sale/summary.md)" \
-   --verbose
+   --summary "$(cat ./sns/open_sale/summary.md)"
