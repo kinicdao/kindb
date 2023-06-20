@@ -1,0 +1,28 @@
+(record {
+  title="Extend Voting Period";
+  url="https://kinic.io";
+  summary="This proposal extends the 24 hour voting period to 5 days.";
+  action=opt variant {
+    ManageNervousSystemParameters = record {
+      default_followees = null;
+      max_dissolve_delay_seconds = null;
+      max_dissolve_delay_bonus_percentage = null;
+      max_followees_per_function = null;
+      neuron_claimer_permissions = null;
+      neuron_minimum_stake_e8s = null;
+      max_neuron_age_for_age_bonus = null;
+      initial_voting_period_seconds = opt (432_000 : nat64);
+      neuron_minimum_dissolve_delay_to_vote_seconds = null;
+      reject_cost_e8s = null;
+      max_proposals_to_keep_per_action = null;
+      wait_for_quiet_deadline_increase_seconds = opt (86_400 : nat64);
+      max_number_of_neurons = null;
+      transaction_fee_e8s = null;
+      max_number_of_proposals_with_ballots = null;
+      max_age_bonus_percentage = null;
+      neuron_grantable_permissions = null;
+      voting_rewards_parameters = null;
+      max_number_of_principals_per_neuron = null;
+    }
+  };
+})
