@@ -1,0 +1,14 @@
+(record {
+  title=\"Execute TransferSnsTreasuryFunds proposal.\";
+  url=\"https://kinic.io\"; 
+  summary=\"This proposal transfers funds from the sns treasury.\";
+  action=opt variant {
+    TransferSnsTreasuryFunds = record {
+      from_treasury=1:int32;
+      amount_e8s=${AMOUNT_E8s}:nat64;
+      to_principal=opt principal \"${TO_PRINCIPAL}\";
+      memo=null;
+      to_subaccount=null;
+    }
+  }
+})
