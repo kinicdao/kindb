@@ -1,0 +1,37 @@
+(record {
+  title="Motion for Steps to Update Frontend Canister";
+  url="";
+  summary="## 📕 Background
+
+  From [latest version](https://github.com/dfinity/sdk/releases/tag/0.14.1):dfx 0.14.1, asset canister now has a commit_proposal_batch, which allows asset canisters to be upgraded by SNS proposals.
+  
+  ## 👟 Required Proposals
+  To update the `Asset Canister` (also called `Frontend Canister`) of Kinic dapp by your votes, These 6 proposals need to be passed.
+  
+  1. Add RegisterAssetPermission Function Proposal
+  2. Add RevokeAssetPermission Function Proposal
+  3. Add CommitProposedBatch Function Proposal
+  4. Excuse RegisterAssetPermission Function Proposal
+  5. Excuse CommitProposedBatch Function Proposal
+  6. Excuse RevokeAssetPermission Function Proposal
+  
+  ### 🔌 RegisterAssetPermission Function
+  
+  This function sets a principal id as `ManagePermissions`; `Prepare`; `Commit` permission to the asset canister.
+  - the `ManagePermissions` can manage other permissions.
+  - the `Prepare` can submit a batch to the asset canister with `dfx --network ic deploy assets --by-proposal`
+  - the `Commit` can commit batches (including proposed batch).
+  
+  ### 🔌 RevokeAssetPermission Function
+  
+  This function deletes permissions. You can check the current permissions in `list_permitted` function of [Kinic frontend canister dashboard](https://dashboard.internetcomputer.org/canister/74iy7-xqaaa-aaaaf-qagra-cai)
+  
+  ### 🔌 CommitProposedBatch Function
+  
+  This function commits a batch proposaled by who has `Prepare` permission.";
+  action=opt variant {
+    Motion = record {
+      motion_text = ""
+    }
+  }
+})
