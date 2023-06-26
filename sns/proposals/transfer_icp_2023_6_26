@@ -1,0 +1,27 @@
+(record {
+  title="Execute TransferSnsTreasuryFunds proposal.";
+  url="https://kinic.io"; 
+  summary="# Kinic Developer Organization (PFF)
+
+  This 'proposal for funding' will release 25,000 ICP from the Kinic Treasury to The Kinic Developer Organization. This will cover the costs of three core developers, community grants, and community developers building the Kinic app. The funding is expected to last until the end of September 2023 (a 3-month duration).
+  
+  ## Roadmap and Milestones
+  
+  - KINIC Utility API usage: Projects can call the Kinic API using KINIC tokens.
+  - Community-driven front-end design change and competition: Kinic is the front page of web3. The design needs to match that fact. Kinic will be holding a decentralized design competition. Front-ends designed in FIGMA (or similar) will be voted on in social media and decided upon in a motion proposal. The awarded designer may receive funding for a [FE codebase](https://github.com/kinicdao/kinic) refactor and design upgrade.
+  - General search upgrades: In the near term, there are a few small changes to make search better. For example, small refactors to better display 'OFFICIAL' on top results.
+  - Maintenance, bug fixes, and partner requests.
+  - Proof of concept ML models will be pushed on-chain and tested with Kinic's datastore.
+  - Potential community grants and awards to support general IC development.
+  
+  Motion proposals can be used by any member of the Kinic DAO to suggest alterations or reprioritizations of the roadmap. These proposals can be discussed on [DSCVR](https://dscvr.one/p/kinicdao) and [OpenChat](https://oc.app/gahtw-iyaaa-aaaar-an2hq-cai).";
+  action=opt variant {
+    TransferSnsTreasuryFunds = record {
+      from_treasury=1:int32;
+      amount_e8s=2_500_000_000_000:nat64;
+      to_principal=opt principal "dyqt4-brei5-rth4z-b4264-otasj-tfkkh-rwxpa-gyzn3-tbpnl-gu56n-yae";
+      memo=null;
+      to_subaccount=null;
+    }
+  }
+})
