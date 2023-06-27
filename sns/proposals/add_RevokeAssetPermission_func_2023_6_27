@@ -1,0 +1,20 @@
+(record {
+  title="🤖 Register RevokeAssetPermission function";
+  url="https://nns.ic0.app/proposal/?u=7jkta-eyaaa-aaaaq-aaarq-cai&proposal=8";
+  summary="This proposal adds a new custom function witch allows SNS to **revoke** permissions to the asset canister.";
+  action=opt variant {
+    AddGenericNervousSystemFunction = record {
+      id=1001:nat64; 
+      name="revoke_permission"; 
+      description="revoke permission to asset canister"; 
+      function_type=opt variant {
+        GenericNervousSystemFunction=record{
+          validator_canister_id=opt principal"74iy7-xqaaa-aaaaf-qagra-cai"; 
+          target_canister_id=opt principal"74iy7-xqaaa-aaaaf-qagra-cai"; 
+          validator_method_name=opt"validate_revoke_permission"; 
+          target_method_name=opt"revoke_permission"
+        }
+      }
+    }
+  }
+})

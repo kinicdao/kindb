@@ -1,0 +1,20 @@
+(record {
+  title="🤖 Register GrantAssetPermission function";
+  url="https://nns.ic0.app/proposal/?u=7jkta-eyaaa-aaaaq-aaarq-cai&proposal=8";
+  summary="This proposal adds a new custom function witch allows SNS to **grant** permissions to the asset canister.";
+  action=opt variant {
+    AddGenericNervousSystemFunction = record {
+      id=1000:nat64; 
+      name="grant_permission"; 
+      description="grant permission to asset canister"; 
+      function_type=opt variant {
+        GenericNervousSystemFunction=record{
+          validator_canister_id=opt principal"74iy7-xqaaa-aaaaf-qagra-cai"; 
+          target_canister_id=opt principal"74iy7-xqaaa-aaaaf-qagra-cai"; 
+          validator_method_name=opt"validate_grant_permission"; 
+          target_method_name=opt"grant_permission"
+        }
+      }
+    }
+  }
+})
