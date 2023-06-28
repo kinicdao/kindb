@@ -1,7 +1,7 @@
 (record {
   title="🤖 Register RevokeAssetPermission function";
   url="https://nns.ic0.app/proposal/?u=7jkta-eyaaa-aaaaq-aaarq-cai&proposal=8";
-  summary="This proposal adds a new custom function witch allows SNS to **revoke** permissions to the asset canister.";
+  summary="This proposal adds a new custom function witch allows SNS to ** revoke ** permissions to the asset canister.";
   action=opt variant {
     AddGenericNervousSystemFunction = record {
       id=1001:nat64; 
