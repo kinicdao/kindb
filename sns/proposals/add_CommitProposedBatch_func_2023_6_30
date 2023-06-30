@@ -1,0 +1,20 @@
+(record {
+  title="🤖 Register CommitProposedBatch function";
+  url="https://dashboard.internetcomputer.org/sns/7jkta-eyaaa-aaaaq-aaarq-cai/proposal/8";
+  summary="This proposal adds a new custom function witch allows SNS to commit proposed batch";
+  action=opt variant {
+    AddGenericNervousSystemFunction = record {
+      id=1003:nat64;
+      name="commit_proposed_batch";
+      description = opt "commit the batch that proposed by community who has Prepare permisson";
+      function_type = opt variant {
+        GenericNervousSystemFunction = record{
+          validator_canister_id = opt principal "74iy7-xqaaa-aaaaf-qagra-cai";
+          target_canister_id = opt principal "74iy7-xqaaa-aaaaf-qagra-cai";
+          validator_method_name = opt "validate_commit_proposed_batch";
+          target_method_name = opt "commit_proposed_batch"
+        }
+      }
+    }
+  }
+})

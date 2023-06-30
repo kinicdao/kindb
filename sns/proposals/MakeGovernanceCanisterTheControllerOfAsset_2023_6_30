@@ -1,0 +1,19 @@
+(record {
+  title="Make governance canister the controller of asset canister";
+  url="https://dashboard.internetcomputer.org/sns/7jkta-eyaaa-aaaaq-aaarq-cai/proposal/8";
+  summary="For a governance canister to execute the functions of an asset canister, the governance canister must be the controller of the asset canister or have ManagePermissions.
+  This DeRegisterProposal can be used to set controllers, therefore DAO can set the controllers to the root canister and governance canister. 
+  And then, SNS registers the asset canister using RegisterProposal again.
+  
+  
+  Note; These processes are completely controlled by the SNS and anyone can propose the RegisterProposal because the root canister remains the controller of the asset.";
+  action=opt variant {
+    DeregisterDappCanisters = record {
+      canister_ids = vec {principal "74iy7-xqaaa-aaaaf-qagra-cai"};
+      new_controllers = vec {
+        principal "74ncn-fqaaa-aaaaq-aaasa-cai";
+        principal "7jkta-eyaaa-aaaaq-aaarq-cai"
+      };
+    }
+  }
+})
