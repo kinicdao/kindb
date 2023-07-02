@@ -11,7 +11,43 @@
     "main": {
       "main": "src/canisters/main.mo",
       "type": "motoko"
+    },
+    "sns_governance": {
+      "build": "",
+      "candid": "candid/sns_governance.did",
+      "type": "custom",
+      "wasm": ""
+    },
+    "sns_index": {
+      "build": "",
+      "candid": "candid/sns_index.did",
+      "type": "custom",
+      "wasm": ""
+    },
+    "sns_ledger": {
+      "build": "",
+      "candid": "candid/sns_ledger.did",
+      "type": "custom",
+      "wasm": ""
+    },
+    "sns_root": {
+      "build": "",
+      "candid": "candid/sns_root.did",
+      "type": "custom",
+      "wasm": ""
+    },
+    "sns_swap": {
+      "build": "",
+      "candid": "candid/sns_swap.did",
+      "type": "custom",
+      "wasm": ""
     }
+  },
+  "declarations": {
+    "capabilities": [
+      "nodejs"
+    ],
+    "output": "src/declarations"
   },
   "defaults": {
     "build": {
@@ -21,15 +57,9 @@
   },
   "networks": {
     "local": {
-        "bind": "127.0.0.1:8080",
-        "type": "ephemeral"
+      "bind": "127.0.0.1:8080",
+      "type": "ephemeral"
     }
-  },
-  "declarations": {
-    "output": "src/declarations",
-    "capabilities": [
-      "nodejs"
-    ]
   },
   "output_env_file": ".env",
   "version": 1
