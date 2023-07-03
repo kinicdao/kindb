@@ -4,7 +4,7 @@ export COMMAND_ROOT=$(pwd)
 
 NEURON_ID=$1
 BATCH_ID=$2
-EVIDENCE_BLOB=$3
+EVIDENCE=$3
 CID=${4:-"74iy7-xqaaa-aaaaf-qagra-cai"}
 FUNCTION_ID=${5:-1003}
 EVIDENCE_BLOB=$(bin/didc decode "4449444c016d7b010020${EVIDENCE}" | grep "^  blob " | sed -e "s/  blob //; s/,//; s/\"//g; ")
