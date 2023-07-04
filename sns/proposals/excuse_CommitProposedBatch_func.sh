@@ -18,6 +18,6 @@ cd $SCRIPT_DIR
 TITLE="🤖 Excuse CommitProposedBatch function"
 URL="https://dashboard.internetcomputer.org/sns/7jkta-eyaaa-aaaaq-aaarq-cai/proposal/8"
 SUMMARY="This proposal excuses CommitProposedBatch function witch allows SNS to commit proposed batch."
-BLOB="$(${COMMAND_ROOT}/bin/didc encode --format blob "(record { batch_id = ${BATCH_ID}; evidence = blob \"${EVIDENCE_BLOB}\"})")"
+BLOB="$(${COMMAND_ROOT}/bin/didc encode --format blob "(record { batch_id = ${BATCH_ID}:nat; evidence = blob \"${EVIDENCE_BLOB}\"})")"
 
 ../scripts/create_proposal_ExcuseGenericNervousSystemFunction.sh "${TITLE}" "${URL}" "${SUMMARY}" "${FUNCTION_ID}" "${BLOB}" $NEURON_ID
