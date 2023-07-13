@@ -1,0 +1,687 @@
+{
+    "5nl7c-zqaaa-aaaah-qaa7a-cai": {
+        "/": {
+            "title": "Saga Tarot",
+            "lang": "",
+            "word_tf": {
+                "enhance": 1,
+                "accelerometer": 1,
+                "readings": 1,
+                "please": 1
+            },
+            "link_set": [],
+            "sentence": {
+                "enhance": "",
+                "accelerometer": "",
+                "readings": "",
+                "please": ""
+            }
+        }
+    },
+    "vcf2f-ayaaa-aaaaf-qaava-cai": {
+        "/": {
+            "title": "ICME V0.2",
+            "lang": "",
+            "word_tf": {
+                "welcome": 1,
+                "internet": 2,
+                "computer": 2,
+                "website": 1,
+                "builder": 1,
+                "products": 1,
+                "create": 3,
+                "without": 1,
+                "needing": 1,
+                "follow": 3,
+                "support": 1,
+                "secure": 1,
+                "efficient": 1,
+                "deploy": 2,
+                "dashboard": 1,
+                "simple": 1,
+                "manuals": 1,
+                "learning": 1,
+                "static": 1,
+                "censorship": 1,
+                "decentralized": 1,
+                "business": 1,
+                "commerce": 1,
+                "online": 1,
+                "experience": 1,
+                "mortar": 1,
+                "social": 2,
+                "always": 1,
+                "wanted": 1,
+                "startup": 1,
+                "inspires": 1,
+                "started": 1,
+                "currently": 1,
+                "closed": 1,
+                "threads": 1,
+                "dfinity": 1,
+                "reddit": 1,
+                "updates": 1
+            },
+            "link_set": [],
+            "sentence": {
+                "welcome": "",
+                "internet": "",
+                "computer": "",
+                "website": "Welcome to the Internet Computer's first website builder.",
+                "builder": "Welcome to the Internet Computer's first website builder.",
+                "products": "Sell your products.",
+                "create": "",
+                "without": " All on the Internet Computer, without needing to know how to code.",
+                "needing": " All on the Internet Computer, without needing to know how to code.",
+                "follow": " Check into our threads on Dfinity Reddit, or follow us for updates!",
+                "support": "",
+                "secure": "Web 3.0 apps are secure, cost efficient, and easy to deploy using ICME's dashboard.",
+                "efficient": "Web 3.0 apps are secure, cost efficient, and easy to deploy using ICME's dashboard.",
+                "deploy": "Web 3.0 apps are secure, cost efficient, and easy to deploy using ICME's dashboard.",
+                "dashboard": "Web 3.0 apps are secure, cost efficient, and easy to deploy using ICME's dashboard.",
+                "simple": "As simple as it gets.",
+                "manuals": " No code, no manuals, no learning curve.",
+                "learning": " No code, no manuals, no learning curve.",
+                "static": "",
+                "censorship": "Keep your blogs safe from censorship on the decentralized web.",
+                "decentralized": "Keep your blogs safe from censorship on the decentralized web.",
+                "business": "Power your business with a novel Dapp.",
+                "commerce": "",
+                "online": "Create an online experience for your brick and mortar store.",
+                "experience": "Create an online experience for your brick and mortar store.",
+                "mortar": "Create an online experience for your brick and mortar store.",
+                "social": "",
+                "always": "",
+                "wanted": "",
+                "startup": "",
+                "inspires": "Make a web 3.0 MVP that inspires.",
+                "started": "Ready to get started?",
+                "currently": "ICME is currently in closed beta.",
+                "closed": "ICME is currently in closed beta.",
+                "threads": " Check into our threads on Dfinity Reddit, or follow us for updates!",
+                "dfinity": "",
+                "reddit": "",
+                "updates": " Check into our threads on Dfinity Reddit, or follow us for updates!"
+            }
+        }
+    },
+    "cu4p3-4aaaa-aaaab-qaaqq-cai": {
+        "/": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 1,
+                "portals": 3,
+                "create": 2,
+                "portal": 1,
+                "creatively": 1,
+                "listen": 1,
+                "voices": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/login",
+                "/signup",
+                "/create-post",
+                "/create-portal",
+                "/portals",
+                "/post/5/introducing-dscvr-a-platform-that-belongs-to-its",
+                "/post/2/site-rules",
+                "/post/3/what-is-this-built-with",
+                "/p/feature-requests",
+                "/p/bugs",
+                "/p/dscvr"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "creatively": "",
+                "listen": "think CrEaTiVely and listen to the voices in your brain!",
+                "voices": "think CrEaTiVely and listen to the voices in your brain!",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/login": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 2,
+                "portals": 3,
+                "create": 2,
+                "portal": 1,
+                "account": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/",
+                "/signup",
+                "/create-post",
+                "/create-portal",
+                "/portals",
+                "/post/5/introducing-dscvr-a-platform-that-belongs-to-its",
+                "/post/2/site-rules",
+                "/post/3/what-is-this-built-with",
+                "/p/feature-requests",
+                "/p/bugs",
+                "/p/dscvr"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "account": "",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/signup": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 1,
+                "portals": 3,
+                "create": 2,
+                "portal": 1,
+                "already": 1,
+                "account": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/",
+                "/login",
+                "/create-post",
+                "/create-portal",
+                "/portals",
+                "/post/5/introducing-dscvr-a-platform-that-belongs-to-its",
+                "/post/2/site-rules",
+                "/post/3/what-is-this-built-with",
+                "/p/feature-requests",
+                "/p/bugs",
+                "/p/dscvr"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "already": "",
+                "account": "",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/create-post": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "logged": 1,
+                "create": 2,
+                "portals": 4,
+                "comments": 1,
+                "content": 1,
+                "signup": 2,
+                "portal": 1
+            },
+            "link_set": [
+                "/login",
+                "/signup",
+                "/",
+                "/create-portal",
+                "/portals"
+            ],
+            "sentence": {
+                "logged": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "create": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "portals": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "comments": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "content": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "signup": "",
+                "portal": "You must be logged in to create posts, portals, write comments, and vote on content!"
+            }
+        },
+        "/create-portal": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "logged": 1,
+                "create": 2,
+                "portals": 4,
+                "comments": 1,
+                "content": 1,
+                "signup": 2,
+                "portal": 1
+            },
+            "link_set": [
+                "/login",
+                "/signup",
+                "/",
+                "/create-post",
+                "/portals"
+            ],
+            "sentence": {
+                "logged": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "create": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "portals": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "comments": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "content": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "signup": "",
+                "portal": "You must be logged in to create posts, portals, write comments, and vote on content!"
+            }
+        },
+        "/portals": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 1,
+                "portals": 3,
+                "create": 2,
+                "portal": 2,
+                "description": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/",
+                "/login",
+                "/signup",
+                "/create-post",
+                "/create-portal",
+                "/post/5/introducing-dscvr-a-platform-that-belongs-to-its",
+                "/post/2/site-rules",
+                "/post/3/what-is-this-built-with",
+                "/p/feature-requests",
+                "/p/bugs",
+                "/p/dscvr"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "description": "",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/post/5/introducing-dscvr-a-platform-that-belongs-to-its": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 1,
+                "portals": 3,
+                "create": 2,
+                "portal": 1,
+                "reload": 1,
+                "comments": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/",
+                "/login",
+                "/signup",
+                "/create-post",
+                "/create-portal",
+                "/portals",
+                "/post/2/site-rules",
+                "/post/3/what-is-this-built-with",
+                "/p/feature-requests",
+                "/p/bugs",
+                "/p/dscvr"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "reload": "",
+                "comments": "",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/post/2/site-rules": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 1,
+                "portals": 3,
+                "create": 2,
+                "portal": 1,
+                "reload": 1,
+                "comments": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/",
+                "/login",
+                "/signup",
+                "/create-post",
+                "/create-portal",
+                "/portals",
+                "/post/5/introducing-dscvr-a-platform-that-belongs-to-its",
+                "/post/3/what-is-this-built-with",
+                "/p/feature-requests",
+                "/p/bugs",
+                "/p/dscvr"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "reload": "",
+                "comments": "",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/post/3/what-is-this-built-with": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 1,
+                "portals": 3,
+                "create": 2,
+                "portal": 1,
+                "reload": 1,
+                "comments": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/",
+                "/login",
+                "/signup",
+                "/create-post",
+                "/create-portal",
+                "/portals",
+                "/post/5/introducing-dscvr-a-platform-that-belongs-to-its",
+                "/post/2/site-rules",
+                "/p/feature-requests",
+                "/p/bugs",
+                "/p/dscvr"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "reload": "",
+                "comments": "",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/p/feature-requests": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 1,
+                "portals": 3,
+                "create": 3,
+                "portal": 1,
+                "feature": 1,
+                "requests": 1,
+                "creatively": 1,
+                "listen": 1,
+                "voices": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/",
+                "/login",
+                "/signup",
+                "/create-post",
+                "/create-portal",
+                "/portals",
+                "/post/5/introducing-dscvr-a-platform-that-belongs-to-its",
+                "/post/2/site-rules",
+                "/post/3/what-is-this-built-with",
+                "/p/bugs",
+                "/p/dscvr",
+                "/p/feature-requests/create"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "feature": "Wait, feature-requests is empty!",
+                "requests": "Wait, feature-requests is empty!",
+                "creatively": "",
+                "listen": "think CrEaTiVely and listen to the voices in your brain!",
+                "voices": "think CrEaTiVely and listen to the voices in your brain!",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/p/bugs": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 1,
+                "portals": 3,
+                "create": 3,
+                "portal": 1,
+                "creatively": 1,
+                "listen": 1,
+                "voices": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/",
+                "/login",
+                "/signup",
+                "/create-post",
+                "/create-portal",
+                "/portals",
+                "/post/5/introducing-dscvr-a-platform-that-belongs-to-its",
+                "/post/2/site-rules",
+                "/post/3/what-is-this-built-with",
+                "/p/feature-requests",
+                "/p/dscvr",
+                "/p/bugs/create"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "creatively": "",
+                "listen": "think CrEaTiVely and listen to the voices in your brain!",
+                "voices": "think CrEaTiVely and listen to the voices in your brain!",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/p/dscvr": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "signup": 1,
+                "portals": 3,
+                "create": 3,
+                "portal": 1,
+                "creatively": 1,
+                "listen": 1,
+                "voices": 1,
+                "internet": 1,
+                "computer": 1,
+                "twitter": 1,
+                "features": 1
+            },
+            "link_set": [
+                "/",
+                "/login",
+                "/signup",
+                "/create-post",
+                "/create-portal",
+                "/portals",
+                "/post/5/introducing-dscvr-a-platform-that-belongs-to-its",
+                "/post/2/site-rules",
+                "/post/3/what-is-this-built-with",
+                "/p/feature-requests",
+                "/p/bugs",
+                "/p/dscvr/create"
+            ],
+            "sentence": {
+                "signup": "",
+                "portals": "",
+                "create": "",
+                "portal": "",
+                "creatively": "",
+                "listen": "think CrEaTiVely and listen to the voices in your brain!",
+                "voices": "think CrEaTiVely and listen to the voices in your brain!",
+                "internet": "",
+                "computer": "",
+                "twitter": "",
+                "features": ""
+            }
+        },
+        "/p/feature-requests/create": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "logged": 1,
+                "create": 2,
+                "portals": 4,
+                "comments": 1,
+                "content": 1,
+                "signup": 2,
+                "portal": 1
+            },
+            "link_set": [
+                "/login",
+                "/signup",
+                "/",
+                "/create-post",
+                "/create-portal",
+                "/portals"
+            ],
+            "sentence": {
+                "logged": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "create": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "portals": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "comments": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "content": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "signup": "",
+                "portal": "You must be logged in to create posts, portals, write comments, and vote on content!"
+            }
+        },
+        "/p/bugs/create": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "logged": 1,
+                "create": 2,
+                "portals": 4,
+                "comments": 1,
+                "content": 1,
+                "signup": 2,
+                "portal": 1
+            },
+            "link_set": [
+                "/login",
+                "/signup",
+                "/",
+                "/create-post",
+                "/create-portal",
+                "/portals"
+            ],
+            "sentence": {
+                "logged": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "create": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "portals": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "comments": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "content": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "signup": "",
+                "portal": "You must be logged in to create posts, portals, write comments, and vote on content!"
+            }
+        },
+        "/p/dscvr/create": {
+            "title": "DSCVR",
+            "lang": "",
+            "word_tf": {
+                "logged": 1,
+                "create": 2,
+                "portals": 4,
+                "comments": 1,
+                "content": 1,
+                "signup": 2,
+                "portal": 1
+            },
+            "link_set": [
+                "/login",
+                "/signup",
+                "/",
+                "/create-post",
+                "/create-portal",
+                "/portals"
+            ],
+            "sentence": {
+                "logged": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "create": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "portals": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "comments": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "content": "You must be logged in to create posts, portals, write comments, and vote on content!",
+                "signup": "",
+                "portal": "You must be logged in to create posts, portals, write comments, and vote on content!"
+            }
+        }
+    },
+    "j2g2d-laaaa-aaaad-qayja-cai": {
+        "/": {
+            "word_tf": [],
+            "link_set": [],
+            "status": "error in 400: 404",
+            "title": ""
+        }
+    }
+}
