@@ -80,3 +80,8 @@ export async function waitTillHTMLRendered(page, timeout = 30000) {
 		  await page.waitForTimeout(checkDurationMsecs);
 	}
 }
+
+export function delete_last_slash(pathname) {
+  if (pathname.slice(-1) == '/') return pathname.slice(0, -1)
+  else return pathname
+};
