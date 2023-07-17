@@ -18,7 +18,7 @@ async function main() {
   // const Start = 0;
   // const End = Start+100;
   const crawling_list = JSON.parse(fs.readFileSync("KinicDB.json", 'utf8'));
-  const SIZE = 10;
+  const SIZE = 500;
   const len = Math.ceil(crawling_list.length/SIZE);
   console.log(len);
   for (let i = 0; i < len; i++) {
