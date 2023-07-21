@@ -22,6 +22,7 @@ import JSON "mo:json/JSON";
 import DateTime "mo:DateTime/DateTime";
 
 import RBT "mo:stable-rbtree/StableRBTree";
+import Parser "mo:parser-combinators/Parser";
 
 shared ({ caller = owner }) actor class Service({
   // the primary key of this canister
@@ -449,8 +450,26 @@ shared ({ caller = owner }) actor class Service({
         case (#String  v) #text v;
         case (#Number  v) #int v;
         case (#Boolean v) #bool v;
-        case (#Object  v) Debug.trap "not supported"; //wip
-        case (#Array   v) Debug.trap "not supported"; //wip
+        case (#Object  v) { // v: [(Text, JSON)]
+          var rbtree = RBT.init<Text, Entity.AttributeValueRBTreeValue>();
+          for ((key, value) in v.vals()) {
+            switch (value) {
+              case (#String  v) rbtree := RBT.put(rbtree, Text.compare, key, #text v);
+              case (#Number  v) rbtree := RBT.put(rbtree, Text.compare, key, #int v);
+              case (#Boolean v) rbtree := RBT.put(rbtree, Text.compare, key, #bool v);
+              case _ Debug.trap "not supported for Array & Object in Object"; //wip
+            }
+          };
+          #tree rbtree;
+        };
+        case (#Array   v) { // v: [JSON]
+          #arrayText(Array.map<JSON.JSON, Text>(v, func(elm) {
+            switch (elm) {
+              case (#String s) s;
+              case _ Debug.trap "not supported for Array except for Text type"; //wip
+            }
+          }));
+        };
       };
       // check required keys. if null, do not assign to requeired keys
       // all text will converted to lower case
