@@ -24,6 +24,8 @@ import DateTime "mo:DateTime/DateTime";
 import RBT "mo:stable-rbtree/StableRBTree";
 import Parser "mo:parser-combinators/Parser";
 
+import Utils "./utils";
+
 shared ({ caller = owner }) actor class Service({
   // the primary key of this canister
   partitionKey: Text;
@@ -345,6 +347,17 @@ shared ({ caller = owner }) actor class Service({
         //   case _ {};
         // };
 
+        // Search by tf-idf score
+        switch (Entity.getAttributeMapValueForKey(entity.attributes, "tf-idf")) {
+          case (?#tree(tf_idf)) switch (RBT.get(tf_idf, Text.compare, "PAGES"), RBT.get(tf_idf, Text.compare, "TITLES")) {
+            case (?pages, ?titles) {
+              
+            // };
+            case _ {};
+          };
+          case _ {};
+        };
+
         if (target.title) {
           var hitCount = 0;
           for (word in words_lowcase.vals()) {
@@ -408,123 +421,7 @@ shared ({ caller = owner }) actor class Service({
 
   /*-- Insert --*/
 
-  func convertToAttributeWithRequeiredKeys(kvPairs: [(Text, JSON.JSON)]):
-    (
-      {
-      type_:      Text;
-      canisterid: Text;
-      lastseen:   Text;
-      titlehash:  Text;
-      apptype:    Text;
-      status:     Text;
-      datalength: Text;
-      canisteridlength: Nat;
-      titlelength:    Nat;
-      subtitlelength: Nat;
-      contentlength:  Nat;
-      notelength:     Nat;
-      },
-      [(Text, Entity.AttributeValue)]
-    )
-  {
-    let metadataAttributes = Buffer.Buffer<(Text, Entity.AttributeValue)>(kvPairs.size());
-
-    // requeired keys
-    var type_null:       ?Text = null;
-    var canisterid_null: ?Text = null;
-    var lastseen:   Text = "2000-01-01";
-    var titlehash:  Text = ENCODED_HASH_MIN;
-    var apptype:    Text = "null"; // Attribute Type has no NULL type
-    var status:     Text = "null"; 
-    var datalength: Text = ENCODED_DATALENGTH_MIN;
-    // metadata
-    var canisteridlength: Nat = 0;
-    var titlelength:    Nat = 0;
-    var subtitlelength: Nat = 0;
-    var contentlength:  Nat = 0;
-    var notelength:     Nat = 0;
-
-    label ConvertToAttribute for ((key, value) in kvPairs.vals()) {
-      let attribute = switch (value) {
-        case (#Null    _) continue ConvertToAttribute;
-        case (#String  v) #text v;
-        case (#Number  v) #int v;
-        case (#Boolean v) #bool v;
-        case (#Object  v) { // v: [(Text, JSON)]
-          var rbtree = RBT.init<Text, Entity.AttributeValueRBTreeValue>();
-          for ((key, value) in v.vals()) {
-            switch (value) {
-              case (#String  v) rbtree := RBT.put(rbtree, Text.compare, key, #text v);
-              case (#Number  v) rbtree := RBT.put(rbtree, Text.compare, key, #int v);
-              case (#Boolean v) rbtree := RBT.put(rbtree, Text.compare, key, #bool v);
-              case _ Debug.trap "not supported for Array & Object in Object"; //wip
-            }
-          };
-          #tree rbtree;
-        };
-        case (#Array   v) { // v: [JSON]
-          #arrayText(Array.map<JSON.JSON, Text>(v, func(elm) {
-            switch (elm) {
-              case (#String s) s;
-              case _ Debug.trap "not supported for Array except for Text type"; //wip
-            }
-          }));
-        };
-      };
-      // check required keys. if null, do not assign to requeired keys
-      // all text will converted to lower case
-      switch (key, attribute) {
-        case ("datalength", #int  v) datalength :=  LexEncode.encodeInt v;
-        case ("type",       #text v) if (v=="") continue ConvertToAttribute else type_null   := ?v; // if v is empty text, treat as null
-        case ("canisterid", #text v) if (v=="") continue ConvertToAttribute else {
-          canisteridlength := v.size();
-          canisterid_null := ?Text.map(v , Prim.charToLower);
-        };
-        case ("lastseen",   #text v) if (v=="") continue ConvertToAttribute else lastseen   := Text.map(v , Prim.charToLower);
-        case ("apptype",    #text v) if (v=="") continue ConvertToAttribute else apptype    := Text.map(v , Prim.charToLower);
-        case ("status",     #text v) if (v=="") continue ConvertToAttribute else status     := Text.map(v , Prim.charToLower); // status is used for score
-        case ("title",      #text v) if (v=="") continue ConvertToAttribute else {
-          titlelength := v.size();
-          titlehash  := LexEncode.encodeInt(Nat32.toNat(Text.hash(Text.map(v , Prim.charToLower))));
-        };
-        
-        // get length
-        case ("subtitle",   #text v) if (v=="") continue ConvertToAttribute else subtitlelength := v.size();
-        case ("content",    #text v) if (v=="") continue ConvertToAttribute else contentlength  := v.size();
-        case ("note",       #text v) if (v=="") continue ConvertToAttribute else notelength     := v.size();
-
-        case (_) {};
-      };
-      metadataAttributes.add((key, attribute)); // Duplicate keys are overwritten
-    };
-    // Check requeired keys
-    let (type_, canisterid) = switch (type_null, canisterid_null) {
-      case (?t, ?c) (t, c);
-      case _ Debug.trap "must include \"type\", \"canisterid\"";
-    };
-
-    return
-    (
-      {
-        type_:      Text;
-        canisterid: Text;
-        lastseen:   Text;
-        titlehash:  Text;
-        apptype:    Text;
-        status:     Text;
-        datalength: Text;
-        canisteridlength: Nat;
-        titlelength:    Nat;
-        subtitlelength: Nat;
-        contentlength:  Nat;
-        notelength:     Nat;
-      }, 
-      Buffer.toArray(metadataAttributes)
-    );
-
-  };
-
-func batchInsert(inputJsonText: Text): async () {
+  func batchInsert(inputJsonText: Text): async () {
 
     let inputJson = switch (JSON.parse inputJsonText) {
       case (?j) j;
@@ -543,7 +440,7 @@ func batchInsert(inputJsonText: Text): async () {
         case _            Debug.trap "second level format must be object";
       };
       
-      let (metadata, metadataAttributes) = convertToAttributeWithRequeiredKeys(kvPairs);
+      let (metadata, metadataAttributes) = Utils.convertToAttributeWithRequeiredKeys(kvPairs);
 
       let (titleSk, lastseenSk, termSk, canisteridSk) =  switch (metadata.type_) {
         case "app" {

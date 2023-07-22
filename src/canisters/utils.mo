@@ -39,6 +39,14 @@ module {
   let ENCODED_DATALENGTH_MAX = "feffffff04"; // LexEncode.encodeInt(NAT32_MAX);
 
   public func convertToAttribute(json: JSON.JSON): Entity.AttributeValue {
+    func jsonArray2TextArray(arrayJson: [JSON.JSON]): [Text] {
+      Array.map<JSON.JSON, Text>(arrayJson, func(elm) {
+        switch (elm) {
+          case (#String s) s;
+          case _ Debug.trap "not supported for Array except for Text type"; //wip
+        }
+      })
+    };
     switch (json) {
       case (#Null    _)  Debug.trap "not supported for Null";
       case (#String  v) #text v;
@@ -51,18 +59,14 @@ module {
             case (#String  v) rbtree := RBT.put(rbtree, Text.compare, key, #text v);
             case (#Number  v) rbtree := RBT.put(rbtree, Text.compare, key, #int v);
             case (#Boolean v) rbtree := RBT.put(rbtree, Text.compare, key, #bool v);
-            case _ Debug.trap "not supported for Array & Object in Object"; //wip
+            case (#Array   v) rbtree := RBT.put(rbtree, Text.compare, key, #arrayText(jsonArray2TextArray(v)));
+            case _ Debug.trap "not supported for Object in Object"; //wip
           }
         };
         #tree rbtree;
       };
       case (#Array   v) { // v: [JSON]
-        #arrayText(Array.map<JSON.JSON, Text>(v, func(elm) {
-          switch (elm) {
-            case (#String s) s;
-            case _ Debug.trap "not supported for Array except for Text type"; //wip
-          }
-        }));
+        #arrayText(jsonArray2TextArray(v));
       };
     };
   };
@@ -131,9 +135,19 @@ module {
         case ("content",    #text v) if (v=="") continue ConvertToAttribute else contentlength  := v.size();
         case ("note",       #text v) if (v=="") continue ConvertToAttribute else notelength     := v.size();
 
+        // optional
+        case ("tf-idf", #tree tf_idf) {
+          if (RBT.get(tf_idf, Text.compare, "PAGES") == null) Debug.trap "must include PAGES key in tf-ifd object";
+          if (RBT.get(tf_idf, Text.compare, "TITLES") == null) Debug.trap "must include TITLES key in tf-ifd object";
+          // note, we can use "PAGES" key as tag, because all words in tf-idf are lower-case.
+          // <"tf-idf", <word, ["<tf-idf><space><the page index of PAGES value>""]>>
+        };
+
         case (_) {};
       };
+
       metadataAttributes.add((key, attribute)); // Duplicate keys are overwritten
+
     };
     // Check requeired keys
     let (type_, canisterid) = switch (type_null, canisterid_null) {
@@ -160,6 +174,61 @@ module {
       Buffer.toArray(metadataAttributes)
     );
 
+  };
+
+  public func findTermInPlainText(words: [(Text, Float)], plainText: Text): Float {  // the words must be ordered by socre
+    for ((word, score) in words.vals()) {
+      if (Text.contains(Text.map(plainText , Prim.charToLower), #text word)) return score;
+    };
+    return 0;
+  };
+
+  public func findTermInPlainText_AND(search_query: [[(Text, Float)]], plainText: Text): Float {  // the words must be ordered by socre
+    var sum = 0.0;
+    for (words in search_query.vals()) {
+      let score = findTermInPlainText(words, plainText);
+      if (score == 0) return 0.0;
+      sum += score;
+    };
+    let average = sum/Float.fromInt(search_query.size());
+    return average
+  };
+
+  public func searchInTitles(titles: [Text], search_query: [[(Text, Float)]]): (Nat, Float) { // float = コサイン類似度
+    var idx = 0;
+    for (title in titles.vals()) {
+      let score = findTermInPlainText_AND(search_query, title);
+      if (score > 0) return (idx, score)
+    };
+    return (0, 0.0);
+  };
+
+  public func firstmatch(tf_idf: RBT.Tree<Text, Entity.AttributeValueRBTreeValue>, words: [(Text, Float)]): ?(Nat, Text, Float){
+    for ((word, cos_score) in words.vals()) {
+      switch (RBT.get(tf_idf, Text.compare, word)) {
+        case (?#text(v)) {
+          let data = Iter.toArray(Text.split(v, #char ' '));
+          let idx = switch (Nat.fromText(data[0])) {
+            case (?idx) idx;
+            case _ Debug.trap "can not convert index_text to nat";
+          };
+          return ?(idx, data[1], cos_score)
+        };
+        case _ {};
+      }
+    };
+    return null;
+  };
+
+  public func searchInTfIdf(tf_idf: RBT.Tree<Text, Entity.AttributeValueRBTreeValue>, search_query: [[(Text, Float)]]): ?[(Nat, Text, Float)] { // float = tf-idf
+    let buffer = Buffer.Buffer<(Nat, Text, Float)>(search_query.size());
+    for (words in search_query.vals()) {
+      switch (firstmatch(tf_idf, words)) {
+        case (?score) buffer.add(score);
+        case null return null;
+      }
+    };
+    return ?Buffer.toArray(buffer);
   };
 
 }

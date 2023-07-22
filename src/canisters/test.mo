@@ -28,13 +28,53 @@ let keyPairs: [(Text, JSON.JSON)] = [
   ("Object", #Object([
     ("key0", #String "string value"),
     ("key1", #Number 0),
-    ("key2", #Boolean true)
+    ("key2", #Boolean true),
+    ("key3", #Array([#String("0"), #String("1"), #String("2"),  #String("3")]))
   ]))
 ];
 for ((key, json) in keyPairs.vals()) {
   ignore U.convertToAttribute(json)
 };
-// ignore U.convertToAttributeWithRequeiredKeys(keyPairs);
+
+// convertToAttributeWithRequeiredKeys
+ignore U.convertToAttributeWithRequeiredKeys([
+  ("datalength", #Number 0),
+  ("type", #String "app"),
+  ("canisterid", #String "aaa-aa"),
+  ("lastseen", #String "2022-05-09"),
+  ("apptype", #String ""),
+  ("status", #String ""),
+  ("title", #String "test title"),
+  ("subtitle", #String "test subtitle"),
+  ("content", #String "test content"),
+  ("note", #String ""),
+  ("tf-idf", #Object([
+    ("TITLES", #Array([#String "path0 title", #String "path1 title", #String "path2 title"])),
+    ("PAGES", #Array([#String "path0 title", #String "path1 title", #String "path2 title"])),
+    ("word1", #Array([#String "index tf-idf value", #String "index tf-idf value", #String "index tf-idf value"])),
+    ("word2", #Array([#String "index tf-idf value", #String "index tf-idf value", #String "index tf-idf value"]))
+  ]))
+]);
+
+
+// findTermInPlainText
+
+assert(U.findTermInPlainText(
+  [
+    ("word1", 1.0),
+    ("word2", 0.9)
+  ],
+  "plainText: Text,   word1"
+) == 1.0);
+
+assert(U.findTermInPlainText_AND(
+  [
+    [("word1", 1.0),("word2", 0.9)],
+    [("word3", 1.0),("word4", 0.1)],
+  ],
+  "plainText: Text,   word2, word4"
+) == 0.5);
+
 Debug.print("Success!");
 
 // $(vessel bin)/moc $(vessel sources 2>/dev/null) src/canisters/test.mo -r --hide-warnings
