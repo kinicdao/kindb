@@ -6,6 +6,7 @@ import fs from 'fs';
 // Local scrips
 import {explore_one_page_V2} from './scraper.js';
 import {isSubnetId} from './utils.js';
+import { type } from 'os';
 
 
 async function main() {
@@ -25,7 +26,7 @@ async function main() {
     const STR = i*SIZE;
     const END = i*SIZE+SIZE;
     const sub = crawling_list.slice(STR, END);
-    const all_collection = await crawling(browser, crawling_list);
+    const all_collection = await crawling(browser, sub);
 
     console.log("end")
 
@@ -43,7 +44,7 @@ async function crawling(browser, crawling_list) {
 
   const MAX_CONCURRENCY = 40;
   const CRAWLING_LENGTH = crawling_list.length;
-  let crawling_index = 0;
+  let crawling_index = -1;
   let promises = [];
 
   let all_collection = {};
@@ -53,9 +54,10 @@ async function crawling(browser, crawling_list) {
   for (let CONCURRENT_ID = 0; CONCURRENT_ID < MAX_CONCURRENCY; CONCURRENT_ID++) {
     let page = await browser.newPage();
     let p = new Promise((resolve) => {
-
+      
       // lexical scope variables
-      let canisterId = crawling_list[crawling_index++]["canisterid"];
+      while(crawling_list[++crawling_index]["type"] != "app") {};
+      let canisterId = crawling_list[crawling_index]["canisterid"];
       let linked_url_count = 0;
       let collection = {};
       let unsearch = [`https://${canisterId}.raw.icp0.io`];
@@ -76,7 +78,22 @@ async function crawling(browser, crawling_list) {
         all_collection[canisterId] = collection;
         if (crawling_index < CRAWLING_LENGTH){
           // reset lexical scope variables
-          canisterId = crawling_list[crawling_index++]["canisterid"];
+
+          crawling_index++;
+          while(true) {
+            if (crawling_index >= CRAWLING_LENGTH) {resolve();return}
+            console.log("canisterid: " + crawling_list[crawling_index]["canisterid"]);
+            console.log("type: " + crawling_list[crawling_index]["type"])
+            let is_app_type = (crawling_list[crawling_index]["type"] == "app");
+            if (is_app_type) break;
+
+            crawling_index++;
+
+            // console.log("canisterid: " + crawling_list[crawling_index]["canisterid"] + ", type: " + crawling_list[crawling_index]["type"])
+          };
+          // while(crawling_list[++crawling_index]["type"] != "app") {};
+
+          canisterId = crawling_list[crawling_index]["canisterid"];
           linked_url_count = 0;
           collection = {};
           unsearch = [`https://${canisterId}.raw.icp0.io`];
