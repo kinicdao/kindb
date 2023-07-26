@@ -105,7 +105,7 @@ shared ({ caller = owner }) actor class Service({
   // Metadata
   type Path = Text;
   type Title = Text;
-  stable var host_count: Nat = 0;
+  stable var host_count: Nat = 0; // WIP: 重複でhostをカウントしてしまう。
 
   func createBatchOptions(sites :[(Host, [Path], [Title], [(Word, ([Tf], [PathIdx]))])]): [CanDB.PutOptions] { 
 
@@ -119,8 +119,8 @@ shared ({ caller = owner }) actor class Service({
       for ((word, (tfs, idxs)) in words.vals()) {
         let sk = jointText(["word", word, "host", host]);
         let attributes = [
-          ("tf", #arrayFloat tfs),
-          ("idx", #arrayInt idxs)
+          ("tfs", #arrayFloat tfs),
+          ("idxs", #arrayInt idxs)
         ];
         buffer.add({sk; attributes});
       };
@@ -168,7 +168,7 @@ shared ({ caller = owner }) actor class Service({
     return Buffer.toArray<T>(set);
   };
 
-  public func search(words: [Word]): async [Entity.Entity] {
+  public query func search(words: [Word]): async [(Host, [(Title, Path, Tf)])] {
     var set: ?[Entity.Entity] = null;
     for (word in words.vals()) {
       let skLowerBound = jointText(["word", word, "host", ""]);
@@ -180,14 +180,12 @@ shared ({ caller = owner }) actor class Service({
         skUpperBound;
         limit;
         ascending = null;
-      });// { entities : [E.Entity]; nextKey : ?E.SK }
+      }); // { entities : [E.Entity]; nextKey : ?E.SK }
 
       set := switch (set) {
         case (?set) ?setIntersect<Entity.Entity>(set, res.entities, compareHost);
         case null ?res.entities;
       };
-
-      Debug.print(debug_show(set))
     };
 
     /*
@@ -195,11 +193,48 @@ shared ({ caller = owner }) actor class Service({
     */
 
     // Buffer.removeDuplicates<Entity.Entity>(merged, compareEntity); // OR Search
+    switch (set) {
+      case (?set) Array.mapFilter<Entity.Entity, (Host, [(Title, Path, Tf)])>(set, func({sk; attributes}){
 
-    return switch (set) {
-      case (?set) set;
+        let host = Iter.toArray(Text.split(sk, #text "#host#"))[1];
+        let data_sk = jointText(["host", host, "titles&pages"]);
+        let a = switch (CanDB.get(db, {sk = data_sk})) {
+          case (?entity) switch (
+            Entity.getAttributeMapValueForKey(entity.attributes, "pages"), 
+            Entity.getAttributeMapValueForKey(entity.attributes, "titles"),
+            Entity.getAttributeMapValueForKey(attributes, "tfs"),
+            Entity.getAttributeMapValueForKey(attributes, "idxs")
+          ) {
+            case (?#arrayText(pages), ?#arrayText(titles), ?#arrayFloat(tfs), ?#arrayInt(idxs)) {
+              Array.mapEntries<Int, (Title, Path, Tf)>(idxs, func (idx, i) {
+                let path_index = Int.abs(idx);
+                (pages[path_index], titles[path_index], tfs[i])
+              })
+            };
+            case _  return null;
+          };
+          case _  return null;
+        };
+
+        return ?(host, a);
+      });
       case null [];
-    }
+    };
   };
+  
+  // public query func searchInTitle(words: [Word]) {
 
+  //   let skLowerBound = jointText(["host", ""]);
+  //   let skUpperBound = jointText(["host", "~"]); // '~' is the last byte of ASCII
+  //   let limit = host_count;
+
+  //   let res = CanDB.scan(db, {
+  //     skLowerBound;
+  //     skUpperBound;
+  //     limit;
+  //     ascending = null;
+  //   });
+
+
+  // };
 }
