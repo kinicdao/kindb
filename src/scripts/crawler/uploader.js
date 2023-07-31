@@ -8,7 +8,7 @@ import fs from 'fs';
 import { caloc_tf } from "./caloc_tf.js";
 
 
-async function upload(serviceCanisterId, identityName, dataPath) {
+async function upload(serviceCanisterId, identityName, sites, page_count_include_the_word) {
   // set service canister client
   const identity = importIdentity(identityName);
   const agent = new HttpAgent({
@@ -19,9 +19,13 @@ async function upload(serviceCanisterId, identityName, dataPath) {
   });
   const serviceActor = ServiceCreateActor(serviceCanisterId, {agent});
 
-  const sites = JSON.parse(fs.readFileSync("src/scripts/crawler/words_0_500.json", 'utf8'));
+  // const sites = JSON.parse(fs.readFileSync("src/scripts/crawler/words_0_500.json", 'utf8'));
+  // const sites = JSON.parse(fs.readFileSync("src/scripts/crawler/words_500_1000.json", 'utf8'));
 
-  let arg = caloc_tf(sites);
+  let arg = caloc_tf(sites, page_count_include_the_word);
+
+  // arg[0].forEach((e) => console.log(e))
+  // console.log(arg[2]/arg[1], arg[3]/arg[1])
 
   // let arg = [
   //   [
@@ -35,13 +39,15 @@ async function upload(serviceCanisterId, identityName, dataPath) {
   //   ]
   // ];
   
-  await serviceActor.batchPut(arg)
-    .then(_ => {
-      console.log("OK");
-    })
-    .catch(e => {
-      console.log(e);
-    });
+  // await serviceActor.batchPut(arg)
+  //   .then(_ => {
+  //     console.log("OK: Data is uploaded");
+  //   })
+  //   .catch(e => {
+  //     console.log(e);
+  //   });
+
+  return [arg[1], arg[2], arg[3]]
 };
 
 
@@ -54,4 +60,30 @@ console.log("canisterid = " + serviceCanisterId)
 console.log("identity name = " + identityName)
 // console.log("json path = " + jsonPath)
 
-upload(serviceCanisterId, identityName)
+let page_count_include_the_word = {};
+
+const SIZE = 500;
+
+for (let i = 0; ; i++) {
+  const STR = i*SIZE;
+  const END = i*SIZE+SIZE;
+  const data_path = `src/scripts/crawler/words_${STR}_${END}.json`;
+
+  try {
+    const sites = JSON.parse(fs.readFileSync(data_path, 'utf8'));
+    console.log("ok: " + data_path)
+    let res = await upload(serviceCanisterId, identityName, sites, page_count_include_the_word);
+    console.log(res)
+  }
+  catch(e) {
+    break
+  };
+};
+
+// console.log( Object.entries(page_count_include_the_word))
+fs.writeFile(`src/scripts/crawler/page_count_include_the_word.json`, JSON.stringify(page_count_include_the_word, null, '    '), err => {
+  if (err) console.log(err.message);
+});
+
+
+// node src/scripts/crawler/uploader.js be2us-64aaa-aaaaa-qaabq-cai default
