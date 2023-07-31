@@ -106,17 +106,20 @@ shared ({ caller = owner }) actor class Service({
   // Metadata
   type Path = Text;
   type Title = Text;
+  type CountOfWord = Nat;
+  type KindOfWord = Nat;
+  type DocumentInfo = (CountOfWord, KindOfWord);
   stable var host_count: Nat = 0; // WIP: 重複でhostをカウントしてしまう。
 
-  func createBatchOptions(sites :[(Host, [Path], [Title], [(Word, ([Tf], [PathIdx]))])]): [CanDB.PutOptions] { 
+  func createBatchOptions(sites :[(Host, [Path], [Title], [CountOfWord], [KindOfWord], [(Word, ([Tf], [PathIdx]))])]): [CanDB.PutOptions] { 
 
     var maxWordsSize = 0;
-    for ((_, _, _, words) in sites.vals()) {
+    for ((_, _, _, _, _, words) in sites.vals()) {
       if (words.size() > maxWordsSize) maxWordsSize := words.size();
     };
     let buffer = Buffer.Buffer<CanDB.PutOptions>(maxWordsSize*sites.size());
 
-    for ((host, pages, titles, words) in sites.vals()) {
+    for ((host, pages, titles, countOfWords, klindOfWords, words) in sites.vals()) {
       for ((word, (tfs, idxs)) in words.vals()) {
         let sk = jointText(["word", word, "host", host]);
         let attributes = [
@@ -126,10 +129,12 @@ shared ({ caller = owner }) actor class Service({
         buffer.add({sk; attributes});
       };
 
-      let sk = jointText(["host", host, "titles&pages"]);
+      let sk = jointText(["host", host, "metadata"]);
       let attributes = [
         ("pages",  #arrayText(pages)),
-        ("titles", #arrayText(titles))
+        ("titles", #arrayText(titles)),
+        ("countOfWords", #arrayInt(countOfWords)),
+        ("kindOfWords", #arrayInt(klindOfWords))
       ];
       buffer.add({sk; attributes});
 
@@ -139,7 +144,7 @@ shared ({ caller = owner }) actor class Service({
     return Buffer.toArray<CanDB.PutOptions>(buffer);
   };
 
-  public func batchPut(sites :[(Host, [Path], [Title], [(Word, ([Tf], [PathIdx]))])]): async () {
+  public func batchPut(sites :[(Host, [Path], [Title], [CountOfWord], [KindOfWord], [(Word, ([Tf], [PathIdx]))])]): async () {
     let batchOptions = createBatchOptions(sites);
     await* CanDB.batchPut(db, batchOptions);
   };
@@ -292,7 +297,7 @@ shared ({ caller = owner }) actor class Service({
       if (pages_tf.size() == 0) return null;
 
       // get host metadata entity
-      let sk = jointText(["host", host, "titles&pages"]);
+      let sk = jointText(["host", host, "metadata"]);
       let entity = switch (CanDB.get(db, {sk})) {
         case (?entity) entity;
         case _ return null;
