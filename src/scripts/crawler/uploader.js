@@ -38,14 +38,16 @@ async function upload(serviceCanisterId, identityName, sites, page_count_include
   //     ]
   //   ]
   // ];
+
   
-  // await serviceActor.batchPut(arg)
-  //   .then(_ => {
-  //     console.log("OK: Data is uploaded");
-  //   })
-  //   .catch(e => {
-  //     console.log(e);
-  //   });
+  await serviceActor.batchPut(arg[0])
+    .then(_ => {
+      console.log("OK: Data is uploaded");
+    })
+    .catch(e => {
+      console.log(e);
+      throw Error(e)
+    });
 
   return [arg[1], arg[2], arg[3]]
 };
@@ -81,9 +83,9 @@ for (let i = 0; ; i++) {
 };
 
 // console.log( Object.entries(page_count_include_the_word))
-fs.writeFile(`src/scripts/crawler/page_count_include_the_word.json`, JSON.stringify(page_count_include_the_word, null, '    '), err => {
-  if (err) console.log(err.message);
-});
+// fs.writeFile(`src/scripts/crawler/page_count_include_the_word.json`, JSON.stringify(page_count_include_the_word, null, '    '), err => {
+//   if (err) console.log(err.message);
+// });
 
 
 // node src/scripts/crawler/uploader.js be2us-64aaa-aaaaa-qaabq-cai default

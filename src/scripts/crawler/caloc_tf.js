@@ -24,7 +24,8 @@ export function caloc_tf(sites, page_count_include_the_word) {
     // console.log(host)
     let pages = [];
     let titles = [];
-    let params = [];
+    let countOfWords = [];
+    let kindOfWords = [];
     let words = {};
     Object.entries(page_infos).forEach(([path, info] = entry, index) => {
       total_page_count++;
@@ -70,14 +71,15 @@ export function caloc_tf(sites, page_count_include_the_word) {
           page_count_include_the_word[w] += 1;
         };
       });
-      params.push([cont_of_words, count_kind_of_words]);
+      countOfWords.push(cont_of_words);
+      kindOfWords.push(count_kind_of_words);
 
       total_word_cout += cont_of_words;
       total_kind_word_count += count_kind_of_words;
     });
     
-    return [host, pages, titles]
-    // return [host, pages, titles, params] // [ ((Host, [Path], [Title]), [(Word, [Tf], [PathIdx])]) ]
+    // return [host, pages, titles]
+    return [host, pages, titles, countOfWords, kindOfWords, Object.entries(words)];
   });
 
   // ToDo: そのwordが含まれている文章数

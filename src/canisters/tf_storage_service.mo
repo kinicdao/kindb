@@ -224,7 +224,7 @@ shared ({ caller = owner }) actor class Service({
   };
 
   type HitPagesOfHost = (Host, [(PathIdx, Tf)]);
-  public query func search(words: [Word]): async [(Host, [(Title, Path, [Tf])])] {
+  public query func search(words: [Word]): async [(Host, [(Title, Path, Int, Int, [Tf])])] { // Int: CountOfWord, Int: KindOfWord
     var hits: [var [HitPagesOfHost]] = Array.init<[HitPagesOfHost]>(words.size(), []);
     var word_idx = 0;
     for (word in words.vals()) {
@@ -293,7 +293,7 @@ shared ({ caller = owner }) actor class Service({
     });
 
     // Resolve the PathIdx and titles. 
-    let resolvedPath =  Buffer.mapFilter<(Host, [(PathIdx, [Tf])]), (Host, [(Title, Path, [Tf])])>(zipedByPathIdx, func((host, pages_tf)) {
+    let resolvedPath =  Buffer.mapFilter<(Host, [(PathIdx, [Tf])]), (Host, [(Title, Path, Int, Int, [Tf])])>(zipedByPathIdx, func((host, pages_tf)) {
       if (pages_tf.size() == 0) return null;
 
       // get host metadata entity
@@ -303,26 +303,29 @@ shared ({ caller = owner }) actor class Service({
         case _ return null;
       };
       // get titles and pages
-      let (titles, page_paths) = switch (
+      let (titles, page_paths, countOfWords, kindOfWords) = switch (
         Entity.getAttributeMapValueForKey(entity.attributes, "titles"),
-        Entity.getAttributeMapValueForKey(entity.attributes, "pages")
+        Entity.getAttributeMapValueForKey(entity.attributes, "pages"),
+        Entity.getAttributeMapValueForKey(entity.attributes, "countOfWords"),
+        Entity.getAttributeMapValueForKey(entity.attributes, "kindOfWords")
       ) {
-        case (?#arrayText(titles), ?#arrayText(page_paths)) (titles, page_paths);
+        case (?#arrayText(titles), ?#arrayText(page_paths), ?#arrayInt(countOfWords), ?#arrayInt(kindOfWords)) (titles, page_paths, countOfWords, kindOfWords);
         case _ return null;
       };
       // access the titles and pages
       // put it togther
-      let res = Buffer.Buffer<(Title, Path, [Tf])>(pages_tf.size());
+      let res = Buffer.Buffer<(Title, Path, Int, Int, [Tf])>(pages_tf.size());
       for ((pathIdx, tfs) in pages_tf.vals()) {
         if (tfs.size() == 0) return null;
         let (title, path) = (titles[pathIdx], page_paths[pathIdx]);
-        res.add((title, path, tfs));
+        let (countOfWord, kindOfWord) = (countOfWords[pathIdx], kindOfWords[pathIdx]);
+        res.add((title, path, countOfWord, kindOfWord, tfs));
       };
 
-      return ?(host, Buffer.toArray<(Title, Path, [Tf])>(res));
+      return ?(host, Buffer.toArray<(Title, Path, Int, Int, [Tf])>(res));
     });
 
-    return Buffer.toArray<(Host, [(Title, Path, [Tf])])>(resolvedPath);
+    return Buffer.toArray<(Host, [(Title, Path, Int, Int, [Tf])])>(resolvedPath);
    };
 
 }
