@@ -26,13 +26,13 @@ async function main() {
     const STR = i*SIZE;
     const END = i*SIZE+SIZE;
     const sub = crawling_list.slice(STR, END);
-    const all_collection = await crawling(browser, sub);
+    await crawling(browser, sub, STR);
 
     console.log("end")
 
-    fs.writeFile(`src/scripts/crawler/words_${STR}_${END}.json`, JSON.stringify(all_collection, null, '    '), err => {
-      if (err) console.log(err.message);
-    });
+    // fs.writeFile(`src/scripts/crawler/words_${STR}_${END}.json`, JSON.stringify(all_collection, null, '    '), err => {
+    //   if (err) console.log(err.message);
+    // });
   };
 
   browser.close();
@@ -40,14 +40,14 @@ async function main() {
 };
 
 
-async function crawling(browser, crawling_list) {
+async function crawling(browser, crawling_list, STR) {
 
   const MAX_CONCURRENCY = 40;
   const CRAWLING_LENGTH = crawling_list.length;
   let crawling_index = -1;
   let promises = [];
 
-  let all_collection = {};
+  // let all_collection = {};
 
   console.log("crawling_list len = " + CRAWLING_LENGTH)
 
@@ -75,7 +75,12 @@ async function crawling(browser, crawling_list) {
           loop();
           return
         };
-        all_collection[canisterId] = collection;
+        
+        // Save the result
+        fs.writeFile(`src/scripts/crawler/words_${STR}/${canisterId}.json`, JSON.stringify(collection, null, '    '), err => {
+          if (err) console.log(err.message);
+        });
+
         if (crawling_index < CRAWLING_LENGTH){
           // reset lexical scope variables
 
@@ -111,7 +116,7 @@ async function crawling(browser, crawling_list) {
 
   await Promise.all(promises);
 
-  return all_collection;
+  return;
 
 };
 
