@@ -53,7 +53,7 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
         if (sub_url.host != working_url.host) continue; // if it doesn't match current domain, skip this link
         if (sub_url_pathname == working_url_pathname) continue; // if it is same page, skip this link。
         if (sub_url_pathname.split("/").length > 5) continue; // too deep link
-        if ((unsearch_hrefs.length + Object.keys(collection).length) > 100) continue;
+        if ((unsearch_hrefs.length + Object.keys(collection).length) > 10) continue;
         /*
         メモ
         sub_url.pathnameは、oringin/path/　と oringin/pathを区別しないので、最後の/をとる。
@@ -62,8 +62,9 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
         */
         
         const linked_href = `${origin}${sub_url_pathname}`;
-    
-        if (!unsearch_hrefs.includes(linked_href) && collection[sub_url_pathname] == null) {  // if the link is in collection or unsearch queue, push the link to unsearch queue
+        
+        // if current path is not root, do not collect sub paths.
+        if (working_url_pathname != '' && !unsearch_hrefs.includes(linked_href) && collection[sub_url_pathname] == null) {  // if the link is in collection or unsearch queue, push the link to unsearch queue
           unsearch_hrefs.push(linked_href);
           // console.log("add unsearch,   href: " + linked_href + "  path: " + sub_url_pathname)
         };
