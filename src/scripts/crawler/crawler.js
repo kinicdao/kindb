@@ -26,13 +26,9 @@ async function main() {
     const STR = i*SIZE;
     const END = i*SIZE+SIZE;
     const sub = crawling_list.slice(STR, END);
-    await crawling(browser, sub, STR);
+    await crawling(browser, sub, -1);
 
     console.log("end")
-
-    // fs.writeFile(`src/scripts/crawler/words_${STR}_${END}.json`, JSON.stringify(all_collection, null, '    '), err => {
-    //   if (err) console.log(err.message);
-    // });
   };
 
   browser.close();
@@ -40,11 +36,11 @@ async function main() {
 };
 
 
-async function crawling(browser, crawling_list, STR) {
+async function crawling(browser, crawling_list, start_crawling_index) {
 
   const MAX_CONCURRENCY = 40;
   const CRAWLING_LENGTH = crawling_list.length;
-  let crawling_index = -1;
+  let crawling_index = start_crawling_index; // default -1;
   let promises = [];
 
   // let all_collection = {};
@@ -57,6 +53,7 @@ async function crawling(browser, crawling_list, STR) {
       
       // lexical scope variables
       while(crawling_list[++crawling_index]["type"] != "app") {};
+      let current_crawling_index = crawling_index;
       let canisterId = crawling_list[crawling_index]["canisterid"];
       let linked_url_count = 0;
       let collection = {};
@@ -77,7 +74,7 @@ async function crawling(browser, crawling_list, STR) {
         };
         
         // Save the result
-        fs.writeFile(`src/scripts/crawler/words_${STR}/${canisterId}.json`, JSON.stringify(collection, null, '    '), err => {
+        fs.writeFile(`src/scripts/crawler/words/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify(collection, null, '    '), err => {
           if (err) console.log(err.message);
         });
 
