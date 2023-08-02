@@ -8,8 +8,9 @@ import fs from 'fs';
 import { caloc_tf } from "./caloc_tf.js";
 
 
-const N = 1910;
-// const N_
+const N_COUNT_DOCUMENTS = 724+853+333; // document count
+const N_AVERAGE_COUNT_WORDS = (40674+191220+28772)/N_COUNT_DOCUMENTS; // document length
+const N_AVERAGE_KIND_WORDS = (24261+90241+18266)/N_COUNT_DOCUMENTS// kinds of word in the document
 
 async function search(serviceCanisterId, identityName) {
   // set service canister client
@@ -38,7 +39,7 @@ async function search(serviceCanisterId, identityName) {
 
   // [ '27kdi-daaaa-aaaak-qaena-cai', [ [ 'NFT Info', '', [Array] ] ] ]
 
-  let DummyIDF = 1.0; // dummy : idf[word]
+  // let DummyIDF = 1.0; // dummy : idf[word]
   const page_count_include_the_word = JSON.parse(fs.readFileSync("src/scripts/crawler/page_count_include_the_word.json", 'utf8'));
 
   // let res = [
@@ -51,12 +52,16 @@ async function search(serviceCanisterId, identityName) {
     // console.log(host)
     let max_tf_idf_page = ['', '', 0.0];
     let total_it_idf_score = 0;
-    pages.forEach(([title, path, tfs]) => {
+    pages.forEach(([title, path, count_words, kind_words, tfs]) => {
       let sum_tf_idf = 0;
       tfs.forEach((tf, i) => {
         let word = query[i];
-        let idf = Math.log2(N/page_count_include_the_word[word]) //  IDF[word]
-        sum_tf_idf += tf*idf;
+        let idf = Math.log2(N_COUNT_DOCUMENTS/page_count_include_the_word[word]) //  IDF[word]
+        // similer Okapi BM25
+        const k = 2.0;
+        const b = 0.75;
+        sum_tf_idf += idf*(((k+1)*tf) / (tf+k*(1-b+b*(N_AVERAGE_COUNT_WORDS/Number(count_words))))); // 通常のBM25は|d|/aver(D)だが、これだと文章が短い方が高スコアになってしまうので、逆にしている。
+        // sum_tf_idf += idf*tf;
       });
       if (sum_tf_idf > max_tf_idf_page[2]) max_tf_idf_page = [title, path, sum_tf_idf];
       total_it_idf_score += sum_tf_idf;
