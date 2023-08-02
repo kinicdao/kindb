@@ -34,3 +34,7 @@ sns/init_config/sns_wasms
 # build
 build/outputs/*
 !build/outputs/.gitkeep
+
+# crawling
+src/scripts/crawler/words/*
+!src/scripts/crawler/words/.gitkeep
