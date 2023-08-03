@@ -114,7 +114,7 @@ shared ({ caller = owner }) actor class Service({
 
   // Count words in this canister used for scaning and deleting word keys
   stable var stableEntries: [(Word, Nat)] = [];
-  let wordMap = HashMap.fromIter<Word, Nat>(stableEntries.vals(), 1, Text.equal, Text.hash);
+  var wordMap = HashMap.fromIter<Word, Nat>(stableEntries.vals(), stableEntries.size(), Text.equal, Text.hash);
   system func postupgrade() {
     stableEntries := Iter.toArray(wordMap.entries());
   };
@@ -146,22 +146,36 @@ shared ({ caller = owner }) actor class Service({
     for ((host, pages, titles, countOfWords, klindOfWords, words) in sites.vals()) {
 
       let metadata_sk = jointText(["host", host, "metadata"]);
+      let metadata_insert_attribute = [
+        ("pages",  #arrayText(pages)),
+        ("titles", #arrayText(titles)),
+        ("countOfWords", #arrayInt(countOfWords)),
+        ("kindOfWords", #arrayInt(klindOfWords))
+      ];
       let new_metadata_attributes = switch (CanDB.get(db, {sk=metadata_sk})) {
-        case (?entity) { // if the host already exsits,
+        case (?entity) { // if the host already exsits, delete all word keys because it may doesn't include old words. then insert all wordkey below
           //wip
           // delete all word keys
-          // update metadata attributes
+          let newWordMapEntries =  Array.mapFilter<(Word, Nat), (Word, Nat)>(Iter.toArray<(Word, Nat)>(wordMap.entries()), func(word, cont) {
+            switch (CanDB.get(db, {sk=jointText(["word", word, "host", host])})) {
+              case (?e) {
+                CanDB.delete(db, {sk=e.sk});
+                if (cont == 1) {return null};
 
-          Debug.trap "";
+                return ?(word, cont-1);
+              };
+              case _ null;
+            };
+          });
+          wordMap := HashMap.fromIter<Word, Nat>(newWordMapEntries.vals(), newWordMapEntries.size(), Text.equal, Text.hash);
+
+          // override attributes
+          Entity.extractKVPairsFromAttributeMap(
+            Entity.updateAttributeMapWithKVPairs(entity.attributes, metadata_insert_attribute)
+          );
         };
         case _ {
-          let metadata_attributes = [
-            ("pages",  #arrayText(pages)),
-            ("titles", #arrayText(titles)),
-            ("countOfWords", #arrayInt(countOfWords)),
-            ("kindOfWords", #arrayInt(klindOfWords))
-          ];
-          metadata_attributes;
+          metadata_insert_attribute
         };
       };
 
