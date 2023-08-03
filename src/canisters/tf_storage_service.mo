@@ -18,6 +18,7 @@ import Time "mo:base/Time";
 import Float "mo:base/Float";
 import Order "mo:base/Order";
 import HashMap "mo:base/HashMap";
+import Option "mo:base/Option";
 
 import LexEncode "mo:lexicographic-encoding/EncodeInt";
 import JSON "mo:json/JSON";
@@ -110,7 +111,6 @@ shared ({ caller = owner }) actor class Service({
   type CountOfWord = Nat;
   type KindOfWord = Nat;
   type DocumentInfo = (CountOfWord, KindOfWord);
-  stable var host_count: Nat = 0; // WIP: 重複でhostをカウントしてしまう
 
   // Count words in this canister used for scaning and deleting word keys
   stable var stableEntries: [(Word, Nat)] = [];
@@ -123,6 +123,16 @@ shared ({ caller = owner }) actor class Service({
       case (?count) wordMap.put(word, count+1);
       case _ wordMap.put(word, 1);
     };
+  };
+  func exsitsWords(words: [Word]): ?[Nat] {
+    let buf = Buffer.Buffer<Nat>(words.size());
+    for (word in words.vals()) {
+      switch (wordMap.get(word)) {
+        case (?c) buf.add(c);
+        case _ return null;
+      };
+    };
+    return ?Buffer.toArray<Nat>(buf);
   };
 
   func createBatchOptions(sites :[(Host, [Path], [Title], [CountOfWord], [KindOfWord], [(Word, ([Tf], [PathIdx]))])]): [CanDB.PutOptions] { 
@@ -254,13 +264,19 @@ shared ({ caller = owner }) actor class Service({
 
   type HitPagesOfHost = (Host, [(PathIdx, Tf)]);
   public query func search(words: [Word]): async [(Host, [(Title, Path, Int, Int, [Tf])])] { // Int: CountOfWord, Int: KindOfWord
+    
+    let wordCount = switch (exsitsWords(words)) {
+      case (?wordCount) wordCount;
+      case _ return [];
+    };
+
     var hits: [var [HitPagesOfHost]] = Array.init<[HitPagesOfHost]>(words.size(), []);
     var word_idx = 0;
     for (word in words.vals()) {
       // Scan CanDB
       let skLowerBound = jointText(["word", word, "host", ""]);
       let skUpperBound = jointText(["word", word, "host", "~"]); // '~' is the last byte of ASCII
-      let limit = host_count;
+      let limit = wordCount[word_idx];
       let res = CanDB.scan(db, {
         skLowerBound;
         skUpperBound;
