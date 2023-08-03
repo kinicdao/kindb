@@ -17,6 +17,7 @@ import Array "mo:base/Array";
 import Time "mo:base/Time";
 import Float "mo:base/Float";
 import Order "mo:base/Order";
+import HashMap "mo:base/HashMap";
 
 import LexEncode "mo:lexicographic-encoding/EncodeInt";
 import JSON "mo:json/JSON";
@@ -109,7 +110,20 @@ shared ({ caller = owner }) actor class Service({
   type CountOfWord = Nat;
   type KindOfWord = Nat;
   type DocumentInfo = (CountOfWord, KindOfWord);
-  stable var host_count: Nat = 0; // WIP: 重複でhostをカウントしてしまう。
+  stable var host_count: Nat = 0; // WIP: 重複でhostをカウントしてしまう
+
+  // Count words in this canister used for scaning and deleting word keys
+  stable var stableEntries: [(Word, Nat)] = [];
+  let wordMap = HashMap.fromIter<Word, Nat>(stableEntries.vals(), 1, Text.equal, Text.hash);
+  system func postupgrade() {
+    stableEntries := Iter.toArray(wordMap.entries());
+  };
+  func incWordCount(word: Word) {
+    switch (wordMap.get(word)) {
+      case (?count) wordMap.put(word, count+1);
+      case _ wordMap.put(word, 1);
+    };
+  };
 
   func createBatchOptions(sites :[(Host, [Path], [Title], [CountOfWord], [KindOfWord], [(Word, ([Tf], [PathIdx]))])]): [CanDB.PutOptions] { 
 
@@ -120,25 +134,40 @@ shared ({ caller = owner }) actor class Service({
     let buffer = Buffer.Buffer<CanDB.PutOptions>(maxWordsSize*sites.size());
 
     for ((host, pages, titles, countOfWords, klindOfWords, words) in sites.vals()) {
+
+      let metadata_sk = jointText(["host", host, "metadata"]);
+      let new_metadata_attributes = switch (CanDB.get(db, {sk=metadata_sk})) {
+        case (?entity) { // if the host already exsits,
+          //wip
+          // delete all word keys
+          // update metadata attributes
+
+          Debug.trap "";
+        };
+        case _ {
+          let metadata_attributes = [
+            ("pages",  #arrayText(pages)),
+            ("titles", #arrayText(titles)),
+            ("countOfWords", #arrayInt(countOfWords)),
+            ("kindOfWords", #arrayInt(klindOfWords))
+          ];
+          metadata_attributes;
+        };
+      };
+
+      buffer.add({sk=metadata_sk; attributes=new_metadata_attributes});
+
       for ((word, (tfs, idxs)) in words.vals()) {
         let sk = jointText(["word", word, "host", host]);
         let attributes = [
           ("tfs", #arrayFloat tfs),
           ("idxs", #arrayInt idxs)
         ];
+        incWordCount(word);
         buffer.add({sk; attributes});
       };
 
-      let sk = jointText(["host", host, "metadata"]);
-      let attributes = [
-        ("pages",  #arrayText(pages)),
-        ("titles", #arrayText(titles)),
-        ("countOfWords", #arrayInt(countOfWords)),
-        ("kindOfWords", #arrayInt(klindOfWords))
-      ];
-      buffer.add({sk; attributes});
-
-      if (not CanDB.skExists(db, sk)) host_count +=1; // this count is used for scan limit
+      // if (not CanDB.skExists(db, sk)) host_count +=1; // this count is used for scan limit
     };
 
     return Buffer.toArray<CanDB.PutOptions>(buffer);
