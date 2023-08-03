@@ -9,7 +9,7 @@ import {isSubnetId} from './utils.js';
 import { type } from 'os';
 
 
-async function main() {
+async function main(start_crawling_index) {
 
   const browser = await puppeteer.launch({
     headless : true,
@@ -19,7 +19,7 @@ async function main() {
   // const Start = 0;
   // const End = Start+100;
   const crawling_list = JSON.parse(fs.readFileSync("KinicDB.json", 'utf8'));
-  await crawling(browser, crawling_list, -1);
+  await crawling(browser, crawling_list, start_crawling_index-1);
 
   browser.close();
   // console.log("finish")
@@ -29,7 +29,7 @@ async function main() {
 
 async function crawling(browser, crawling_list, start_crawling_index) {
 
-  const MAX_CONCURRENCY = 20;
+  const MAX_CONCURRENCY = 40;
   const CRAWLING_LENGTH = crawling_list.length;
   let crawling_index = start_crawling_index; // default -1;
   let promises = [];
@@ -112,5 +112,7 @@ async function crawling(browser, crawling_list, start_crawling_index) {
 
 };
 
+let start_crawling_index = process.argv[2]
+if (start_crawling_index == undefined) start_crawling_index = 0;
 
-await main();
+await main(start_crawling_index);

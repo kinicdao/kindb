@@ -100,7 +100,7 @@ function write_err_to_collection(err_msg, collection, pathname, title) {
   collection[pathname] = {
     "word_tf" : [], 
     "link_set" : [],
-    "status" : err_msg,
+    "status" : err_msg.toString(),
     "title" : title
   }
 };
