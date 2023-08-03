@@ -19,17 +19,7 @@ async function main() {
   // const Start = 0;
   // const End = Start+100;
   const crawling_list = JSON.parse(fs.readFileSync("KinicDB.json", 'utf8'));
-  const SIZE = 500;
-  const len = Math.ceil(crawling_list.length/SIZE);
-  console.log(len);
-  for (let i = 0; i < len; i++) {
-    const STR = i*SIZE;
-    const END = i*SIZE+SIZE;
-    const sub = crawling_list.slice(STR, END);
-    await crawling(browser, sub, -1);
-
-    console.log("end")
-  };
+  await crawling(browser, crawling_list, -1);
 
   browser.close();
   // console.log("finish")
@@ -39,7 +29,7 @@ async function main() {
 
 async function crawling(browser, crawling_list, start_crawling_index) {
 
-  const MAX_CONCURRENCY = 40;
+  const MAX_CONCURRENCY = 3;
   const CRAWLING_LENGTH = crawling_list.length;
   let crawling_index = start_crawling_index; // default -1;
   let promises = [];
@@ -98,7 +88,8 @@ async function crawling(browser, crawling_list, start_crawling_index) {
             // console.log("canisterid: " + crawling_list[crawling_index]["canisterid"] + ", type: " + crawling_list[crawling_index]["type"])
           };
           // while(crawling_list[++crawling_index]["type"] != "app") {};
-
+          
+          current_crawling_index = crawling_index;
           canisterId = crawling_list[crawling_index]["canisterid"];
           linked_url_count = 0;
           collection = {};
