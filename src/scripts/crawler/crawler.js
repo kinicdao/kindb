@@ -36,12 +36,16 @@ async function main() {
 };
 
 
+
 async function crawling(browser, crawling_list, start_crawling_index) {
 
   const MAX_CONCURRENCY = 40;
   const CRAWLING_LENGTH = crawling_list.length;
   let crawling_index = start_crawling_index; // default -1;
   let promises = [];
+
+  const date = new Date()
+  let crawling_date = date.toLocaleDateString('en-GB').split('/').reverse().join('');
 
   // let all_collection = {};
 
@@ -74,7 +78,7 @@ async function crawling(browser, crawling_list, start_crawling_index) {
         };
         
         // Save the result
-        fs.writeFile(`src/scripts/crawler/words/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify(collection, null, '    '), err => {
+        fs.writeFile(`src/scripts/crawler/words/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({canisterId: collection, "lastseen": crawling_date}, null, '    '), err => {
           if (err) console.log(err.message);
         });
 

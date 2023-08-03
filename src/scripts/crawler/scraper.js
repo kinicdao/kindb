@@ -64,7 +64,7 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
         const linked_href = `${origin}${sub_url_pathname}`;
         
         // if current path is not root, do not collect sub paths.
-        if (working_url_pathname != '' && !unsearch_hrefs.includes(linked_href) && collection[sub_url_pathname] == null) {  // if the link is in collection or unsearch queue, push the link to unsearch queue
+        if (working_url_pathname == '' && !unsearch_hrefs.includes(linked_href) && collection[sub_url_pathname] == null) {  // if the link is in collection or unsearch queue, push the link to unsearch queue
           unsearch_hrefs.push(linked_href);
           // console.log("add unsearch,   href: " + linked_href + "  path: " + sub_url_pathname)
         };
