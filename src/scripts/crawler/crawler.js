@@ -29,7 +29,7 @@ async function main() {
 
 async function crawling(browser, crawling_list, start_crawling_index) {
 
-  const MAX_CONCURRENCY = 3;
+  const MAX_CONCURRENCY = 20;
   const CRAWLING_LENGTH = crawling_list.length;
   let crawling_index = start_crawling_index; // default -1;
   let promises = [];
@@ -62,13 +62,13 @@ async function crawling(browser, crawling_list, start_crawling_index) {
           linked_url_count++;
           const next_href = unsearch.shift();
           await explore_one_page_V2(page, next_href, unsearch, collection);
-          console.log(`id: ${CONCURRENT_ID}, canister: ${canisterId}, now deal: ${linked_url_count} ,rest unsaerch: ${unsearch.length} \n`)
+          console.log(`crawling_idx: ${current_crawling_index}, concurrent_id: ${CONCURRENT_ID}, canister: ${canisterId}, now deal: ${linked_url_count} ,rest unsaerch: ${unsearch.length} \n`)
           loop();
           return
         };
         
         // Save the result
-        fs.writeFile(`src/scripts/crawler/words/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({canisterId: collection, "lastseen": crawling_date}, null, '    '), err => {
+        fs.writeFile(`src/scripts/crawler/words/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
           if (err) console.log(err.message);
         });
 
