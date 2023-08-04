@@ -88,6 +88,7 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
   }
   catch (e) { // if the URL is broken, skip this page.
     console.log(`error in ${working_url_pathname}: \n${e}`);
+    if (e.toString == "TargetCloseError: Protocol error (Runtime.callFunctionOn): Session closed. Most likely the page has been closed.") throw e;
     write_err_to_collection(e, collection, working_url_pathname, title);
     return 
   };
