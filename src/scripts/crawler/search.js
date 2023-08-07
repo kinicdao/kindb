@@ -25,7 +25,7 @@ async function search(serviceCanisterId, identityName) {
 
   const sites = JSON.parse(fs.readFileSync("src/scripts/crawler/words_0_500.json", 'utf8'));
 
-  let query = ["canister"];
+  let query = ["dashboard", "developer"];
   
   let res = await serviceActor.search(query)
     .then(res => {
@@ -36,6 +36,9 @@ async function search(serviceCanisterId, identityName) {
     .catch(e => {
       console.log(e);
     });
+
+  console.log("result num: " + res.length);
+  // console.log("response size:" + JSON.stringify(res).length);
 
   // [ '27kdi-daaaa-aaaak-qaena-cai', [ [ 'NFT Info', '', [Array] ] ] ]
 
@@ -86,18 +89,6 @@ async function search(serviceCanisterId, identityName) {
   });
   console.log(sorted_by_tf_idf)
 
-
-
-  /*
-
-  ToDo
-  - Set idf constant variable
-  - Multipile the idf to each page
-
-  - root pageがある場合、
-    - 
-  
-  */
   
 };
 

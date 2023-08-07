@@ -38,3 +38,11 @@ build/outputs/*
 # crawling
 src/scripts/crawler/words/*
 !src/scripts/crawler/words/.gitkeep
+
+src/scripts/crawler/word_chunk/*
+!src/scripts/crawler/word_chunk/.gitkeep
+
+# uploading
+src/scripts/crawler/page_count_include_the_word
+src/scripts/crawler/log/*
+!src/scripts/crawler/log/.gitkeep

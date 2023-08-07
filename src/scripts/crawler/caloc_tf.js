@@ -2,14 +2,32 @@ import fs from 'fs';
 
 export function caloc_tf(sites, page_count_include_the_word) {
 
-  // delete empty word tf
-  Object.entries(sites).forEach(([host, page_infos] = entry) => {
-    Object.entries(page_infos).forEach(([path, info] = entry, index) => {
-      if (info.word_tf.length == 0) {
-        delete sites[host][path]
-      }
+  sites.forEach((site, idx) => {
+    let host = site['canisterId'];
+    let page_infos = site['collection'];
+
+    Object.entries(page_infos).forEach(([path, info] = entry) => {
+      if (info.word_tf.length == 0 || info.title == undefined) {
+        delete (sites[idx].collection)[path]
+        // console.log("delete " + site.canisterId);
+      };
     });
   });
+
+
+  // Debug
+  sites.forEach((site) => {
+    if (site.serviceCanisterId == "dsmzx-jaaaa-aaaak-qagra-cai") console.log("In dropping empty, include dsmzx-jaaaa-aaaak-qagra-cai");
+  });
+
+  // delete empty word tf
+  // Object.entries(sites).forEach(([host, page_infos] = entry) => {
+  //   Object.entries(page_infos).forEach(([path, info] = entry, index) => {
+  //     if (info.word_tf.length == 0) {
+  //       delete sites[host][path]
+  //     }
+  //   });
+  // });
 
   // 単語数と単語の種類の平均を求める用
   let total_page_count = 0;
@@ -19,14 +37,17 @@ export function caloc_tf(sites, page_count_include_the_word) {
   // 単語が含まれている文章数
   // let page_count_include_the_word = {};
 
+  let res = sites.map((site) => {
+    let host = site['canisterId'];
+    let page_infos = site['collection'];
 
-  let res = Object.entries(sites).map(([host, page_infos] = entry) => {
     // console.log(host)
     let pages = [];
     let titles = [];
     let countOfWords = [];
     let kindOfWords = [];
     let words = {};
+
     Object.entries(page_infos).forEach(([path, info] = entry, index) => {
       total_page_count++;
       pages.push(path)
@@ -78,7 +99,6 @@ export function caloc_tf(sites, page_count_include_the_word) {
       total_kind_word_count += count_kind_of_words;
     });
     
-    // return [host, pages, titles]
     return [host, pages, titles, countOfWords, kindOfWords, Object.entries(words)];
   });
 

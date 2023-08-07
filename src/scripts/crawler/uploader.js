@@ -23,11 +23,12 @@ async function upload(serviceCanisterId, identityName, sites, page_count_include
   // const sites = JSON.parse(fs.readFileSync("src/scripts/crawler/words_500_1000.json", 'utf8'));
 
   let arg = caloc_tf(sites, page_count_include_the_word);
+  // console.log(arg[0])
 
   // arg[0].forEach((e) => console.log(e))
   // console.log(arg[2]/arg[1], arg[3]/arg[1])
 
-  // let arg = [
+  // arg = [
   //   [
   //     "Host", 
   //     ["Path"],
@@ -38,6 +39,11 @@ async function upload(serviceCanisterId, identityName, sites, page_count_include
   //     ]
   //   ]
   // ];
+
+  // Debug
+  // arg[0].forEach(([host, _]) => {
+  //   if (host == "dsmzx-jaaaa-aaaak-qagra-cai") console.log("In uploading db, include dsmzx-jaaaa-aaaak-qagra-cai");
+  // });
 
   
   await serviceActor.batchPut(arg[0])
@@ -54,33 +60,68 @@ async function upload(serviceCanisterId, identityName, sites, page_count_include
 
 
 if (process.argv.length != 4) throw "uploader.js <service canisterid> <your dfx identity name>"
-let serviceCanisterId = process.argv[2]
-let identityName = process.argv[3]
+let serviceCanisterId = process.argv[2];
+let identityName = process.argv[3];
 // let jsonPath = process.argv[4]
 
-console.log("canisterid = " + serviceCanisterId)
-console.log("identity name = " + identityName)
+console.log("canisterid = " + serviceCanisterId);
+console.log("identity name = " + identityName);
 // console.log("json path = " + jsonPath)
 
-let page_count_include_the_word = {};
+// Load word data
+console.log("loading words");
 
-const SIZE = 500;
 
-for (let i = 0; ; i++) {
-  const STR = i*SIZE;
-  const END = i*SIZE+SIZE;
-  const data_path = `src/scripts/crawler/words_${STR}_${END}.json`;
 
-  try {
-    const sites = JSON.parse(fs.readFileSync(data_path, 'utf8'));
-    console.log("ok: " + data_path)
-    let res = await upload(serviceCanisterId, identityName, sites, page_count_include_the_word);
-    console.log(res)
-  }
-  catch(e) {
-    break
+// Load word data files
+const chunks = fs.readdirSync('src/scripts/crawler/word_chunks');
+let l = 0;
+for (const chunk of chunks) {
+  if (chunk == ".gitkeep" || chunk == ".DS_Store") continue
+  console.log("chunk: " + chunk)
+  const filenames = fs.readdirSync('src/scripts/crawler/word_chunks/' + chunk);
+
+  let sites = [];
+
+  console.log("filenames length " + filenames.length);
+  for (const filename of filenames) {
+    // console.log(filename)
+    if (filename == '.gitkeep' || filename == '.DS_Store') continue;
+    sites.push(JSON.parse(fs.readFileSync(`src/scripts/crawler/word_chunks/${chunk}/${filename}`, 'utf8')));
   };
-};
+
+  // Debug
+  // sites.forEach((site) => {
+  //   if (site.serviceCanisterId == "dsmzx-jaaaa-aaaak-qagra-cai") console.log("In file fetch, include dsmzx-jaaaa-aaaak-qagra-cai");
+  // });
+
+  let page_count_include_the_word = {};
+
+  const SIZE = 500;
+
+  console.log("sites length = " + sites.length)
+
+  for (let i = 0; ; i++) {
+    const STR = i*SIZE;
+    const END = i*SIZE+SIZE;
+
+    try {
+      const sub = sites.slice(STR, END);
+      console.log(STR + " - " +  END);
+      let res = await upload(serviceCanisterId, identityName, sub, page_count_include_the_word);
+      console.log(res)
+    }
+    catch(e) {
+      break
+    };
+
+    if (END > sites.length) break; // !! Note, Must be included
+  };
+}
+
+
+
+console.log("Finish Upload")
 
 // console.log( Object.entries(page_count_include_the_word))
 // fs.writeFile(`src/scripts/crawler/page_count_include_the_word.json`, JSON.stringify(page_count_include_the_word, null, '    '), err => {
