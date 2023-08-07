@@ -1,0 +1,19 @@
+(record {
+  title="Motion to commission and implement new FE design";
+  url="";
+  summary="## 📕 Background
+
+  Kinic recently had a decentralized design competition. The [winning design](https://twitter.com/kinic_app/status/1686961073357000704?s=20) has been selected by judges and the community via voting. The Kinic Developer Organization would like to commission this design while the core team continues working on important backend updates.
+  
+  ## 👟 What this motion is for?
+  This motion is to show that the DAO has approved the design work as chosen in the competition. Funds from the Kinic Developer Organization will be used; no extra funds from the treasury are being requested.
+  
+  1. The DAO has decided on the winning design.
+  2. Create grants to commission the design work.
+  3. Create another proposal in the future to update Kinic FE to this new design.";
+  action=opt variant {
+    Motion = record {
+      motion_text = ""
+    }
+  } 
+})
