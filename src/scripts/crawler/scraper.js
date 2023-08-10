@@ -26,7 +26,6 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
 
     const body_element = await page.$("body");
     let text_content = await page.evaluate(elm => elm.innerText, body_element);
-    console.log(text_content)
 
     if (text_content.length == 0) throw new Error("text_content is empty");
 
@@ -37,10 +36,12 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
   
     if ("eng" && "spa" && "rus" && "por" && "fra" && "deu" && "ita") {
       let txt = text_content.toLowerCase();
-      txt = txt.replace(/[^a-z']/g,' ');
-      txt = txt.replace(/ +/g,' ');
-      txt = txt.trim()
-      txt = txt.split(' ')
+      txt = txt.toLowerCase();
+      txt = txt.replace(/[^!-~]/g,' ')
+      txt = txt.replace(/[\s]+/g,' ')
+      txt = txt.replace(/ +/g,' ')
+      txt = txt.trim(); // trip head and tail space
+      txt = txt.split(' '); // split by space
 
       // const regex = /\b\w{6,}\b/g;
       const words = removeStopwords(txt).map((w) => w.toLowerCase());
@@ -62,6 +63,7 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
         if (sub_url_pathname == working_url_pathname) continue; // if it is same page, skip this link。
         if (sub_url_pathname.split("/").length > 5) continue; // too deep link
         if ((unsearch_hrefs.length + Object.keys(collection).length) > 10) continue;
+        if (sub_url_pathname.split('.')[1] == 'xml') continue;
         /*
         メモ
         sub_url.pathnameは、oringin/path/　と oringin/pathを区別しないので、最後の/をとる。

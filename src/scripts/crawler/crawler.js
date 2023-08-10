@@ -29,7 +29,7 @@ async function main(start_crawling_index) {
 
 async function crawling(browser, crawling_list, start_crawling_index) {
 
-  const MAX_CONCURRENCY = 40;
+  const MAX_CONCURRENCY = 15;
   const CRAWLING_LENGTH = crawling_list.length;
   let crawling_index = start_crawling_index; // default -1;
   let promises = [];
@@ -68,7 +68,7 @@ async function crawling(browser, crawling_list, start_crawling_index) {
         };
         
         // Save the result
-        fs.writeFile(`src/scripts/crawler/words/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
+        fs.writeFile(`src/scripts/crawler/word_chunks/idx_${Math.floor(current_crawling_index/1000)}K/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
           if (err) console.log(err.message);
         });
 
