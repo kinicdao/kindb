@@ -5,8 +5,8 @@ import { importIdentity } from "../upload/loadpem.js";
 import { createActor as ServiceCreateActor } from "../../declarations/tf_storage_service/index.js"; // Need to commentout "export const main = createActor(canisterId);" in this file.
 import fs from 'fs';
 
-import { caloc_tf } from "./caloc_tf.js";
-
+import {searchContent} from "./searchContent.js";
+import {searchTitle} from "./searchTitle.js";
 
 const N_COUNT_DOCUMENTS = 724+853+333; // document count
 const N_AVERAGE_COUNT_WORDS = (40674+191220+28772)/N_COUNT_DOCUMENTS; // document length
@@ -16,78 +16,63 @@ async function search(serviceCanisterId, identityName) {
   // set service canister client
   const identity = importIdentity(identityName);
   const agent = new HttpAgent({
-    identity: identity,
+    // identity: identity,
     // host: "https://ic0.app",
     host: "http://127.0.0.1:8080",
     fetch,
   });
   const serviceActor = ServiceCreateActor(serviceCanisterId, {agent});
 
-  const sites = JSON.parse(fs.readFileSync("src/scripts/crawler/words_0_500.json", 'utf8'));
+  let query = ["account"];
 
-  let query = ["dashboard", "developer"];
-  
-  let res = await serviceActor.search(query)
-    .then(res => {
-      console.log("OK");
-      // console.log(res);
-      return res
-    })
-    .catch(e => {
-      console.log(e);
-    });
+  let hosts_content = await searchContent(serviceActor, query);
+  let hosts_title = await searchTitle(serviceActor, query);
 
-  console.log("result num: " + res.length);
-  // console.log("response size:" + JSON.stringify(res).length);
 
-  // [ '27kdi-daaaa-aaaak-qaena-cai', [ [ 'NFT Info', '', [Array] ] ] ]
-
-  // let DummyIDF = 1.0; // dummy : idf[word]
-  const page_count_include_the_word = JSON.parse(fs.readFileSync("src/scripts/crawler/page_count_include_the_word.json", 'utf8'));
-
-  // let res = [
-  //   [ 'a', [ [ 'p1', '', [0.5,0.1]],  [ 'p2', '/p2', [0.5,0.5]], [ 'p3', '/p3', [0.5,0.3]]] ],
-  //   [ 'b', [ [ 'p1', '', [0.5,0.1]],  [ 'p2', '/p2', [0.5,0.5]], [ 'p3', '/p3', [0.5,0.3]]] ],
-  //   [ 'c', [ [ 'p1', '/p', [0.5,0.1]],  [ 'p2', '/p2', [0.5,0.5]], [ 'p3', '/p3', [0.5,0.6]]] ]
-  // ]
-
-  let hosts = res.map(([host, pages]) => {
-    // console.log(host)
-    let max_tf_idf_page = ['', '', 0.0];
-    let total_it_idf_score = 0;
-    pages.forEach(([title, path, count_words, kind_words, tfs]) => {
-      let sum_tf_idf = 0;
-      tfs.forEach((tf, i) => {
-        let word = query[i];
-        let idf = Math.log2(N_COUNT_DOCUMENTS/page_count_include_the_word[word]) //  IDF[word]
-        // similer Okapi BM25
-        const k = 2.0;
-        const b = 0.75;
-        sum_tf_idf += idf*(((k+1)*tf) / (tf+k*(1-b+b*(N_AVERAGE_COUNT_WORDS/Number(count_words))))); // 通常のBM25は|d|/aver(D)だが、これだと文章が短い方が高スコアになってしまうので、逆にしている。
-        // sum_tf_idf += idf*tf;
-      });
-      if (sum_tf_idf > max_tf_idf_page[2]) max_tf_idf_page = [title, path, sum_tf_idf];
-      total_it_idf_score += sum_tf_idf;
-    });
-
-    let show_page = [];
-    if (pages[0][1] == "") {
-      show_page = pages[0];
-    }
-    else {
-      show_page = max_tf_idf_page;
+  const weight = 0.5;
+  // delete duplication
+  hosts_title = hosts_title.filter(([host, t, p, title_score]) => {
+    for (let i = 0; i < hosts_content.length; i++) {
+      if (hosts_content[i][0] == host) {
+        let content_score = hosts_content[i][3];
+        let total_score =  content_score + weight * title_score;
+        hosts_content[i] = [host,  hosts_content[i][1],  hosts_content[i][2], total_score]
+        return null
+      };
     };
-    
-    // console.log(host, show_page[0], show_page[1], total_it_idf_score);
-    return [host, show_page[0], show_page[1], total_it_idf_score]
+    return [host, t, p, weight*title_score];
   });
-  
-  // let multipiled_idf = [ [ 'page1', '', 1.0 ],  [ 'page2', '/page2', 1.5 ], [ 'page3', '/page3', 0.7 ] ];
+
+  // merge
+  let hosts = hosts_content.concat(hosts_title);
+  console.log(hosts.length)
+
   let sorted_by_tf_idf = hosts.sort(function(a, b){
-    // console.log(a[2], b[2])
     return b[3] -  a[3]
   });
-  console.log(sorted_by_tf_idf)
+
+  let j = sorted_by_tf_idf.map(([h, t, p, s]) => {
+    let info = {
+      "id": 0,
+      "canisterid": h,
+      "subnetid": "sample-subnetid",
+      "type": "app",
+      "datalength": 80,
+      "lastseen": "2023-08-10",
+      "title": t,
+      "subtitle": "sample-subtitle",
+      "content": "",
+      "apptype": "",
+      "note": "",
+      "status": "",
+      "notnull": ""
+    };
+
+    return info
+  });
+
+
+  console.log(j)
 
   
 };

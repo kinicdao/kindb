@@ -23,28 +23,8 @@ async function upload(serviceCanisterId, identityName, sites, page_count_include
   // const sites = JSON.parse(fs.readFileSync("src/scripts/crawler/words_500_1000.json", 'utf8'));
 
   let arg = caloc_tf(sites, page_count_include_the_word);
-  // console.log(arg[0])
-
-  // arg[0].forEach((e) => console.log(e))
-  // console.log(arg[2]/arg[1], arg[3]/arg[1])
-
-  // arg = [
-  //   [
-  //     "Host", 
-  //     ["Path"],
-  //     ["Title"], 
-  //     [
-  //       ["Word", [[0.2], [0]]],
-  //       ["Word1", [[0.07894736842105263], [0]]],
-  //     ]
-  //   ]
-  // ];
-
-  // Debug
-  // arg[0].forEach(([host, _]) => {
-  //   if (host == "dsmzx-jaaaa-aaaak-qagra-cai") console.log("In uploading db, include dsmzx-jaaaa-aaaak-qagra-cai");
-  // });
-
+  console.log("arg length "+ arg.length)
+  
   
   await serviceActor.batchPut(arg[0])
     .then(_ => {
@@ -66,28 +46,26 @@ let identityName = process.argv[3];
 
 console.log("canisterid = " + serviceCanisterId);
 console.log("identity name = " + identityName);
+console.log("\n\n")
 // console.log("json path = " + jsonPath)
-
-// Load word data
-console.log("loading words");
 
 
 
 // Load word data files
-const chunks = fs.readdirSync('src/scripts/crawler/word_chunks');
+const chunks = fs.readdirSync('src/scripts/crawler/regulared_words_chunks');
 let l = 0;
 for (const chunk of chunks) {
-  if (chunk == ".gitkeep" || chunk == ".DS_Store") continue
+  if (chunk == ".gitkeep" || chunk == ".DS_Store" || chunk == "page_count_include_the_word.json") continue
   console.log("chunk: " + chunk)
-  const filenames = fs.readdirSync('src/scripts/crawler/word_chunks/' + chunk);
+  const filenames = fs.readdirSync('src/scripts/crawler/regulared_words_chunks/' + chunk);
 
   let sites = [];
 
-  console.log("filenames length " + filenames.length);
+  // console.log("filenames length " + filenames.length);
   for (const filename of filenames) {
     // console.log(filename)
     if (filename == '.gitkeep' || filename == '.DS_Store') continue;
-    sites.push(JSON.parse(fs.readFileSync(`src/scripts/crawler/word_chunks/${chunk}/${filename}`, 'utf8')));
+    sites.push(JSON.parse(fs.readFileSync(`src/scripts/crawler/regulared_words_chunks/${chunk}/${filename}`, 'utf8')));
   };
 
   // Debug
@@ -117,16 +95,12 @@ for (const chunk of chunks) {
 
     if (END > sites.length) break; // !! Note, Must be included
   };
+  
+  console.log("\n")
 }
 
 
 
 console.log("Finish Upload")
-
-// console.log( Object.entries(page_count_include_the_word))
-// fs.writeFile(`src/scripts/crawler/page_count_include_the_word.json`, JSON.stringify(page_count_include_the_word, null, '    '), err => {
-//   if (err) console.log(err.message);
-// });
-
 
 // node src/scripts/crawler/uploader.js be2us-64aaa-aaaaa-qaabq-cai default

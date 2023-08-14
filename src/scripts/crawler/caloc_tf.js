@@ -13,6 +13,7 @@ export function caloc_tf(sites, page_count_include_the_word) {
       };
     });
   });
+  console.log(sites.length)
 
 
   // Debug

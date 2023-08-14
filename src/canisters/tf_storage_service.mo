@@ -80,19 +80,9 @@ shared ({ caller = owner }) actor class Service({
   /*
 
   <SK, Attribute>
-    - canisteridSk:
-      Key:        "#canisterid#<canisterid>"
-      Attribute:  [("metadataSk", <metadataSk>), ("titleSk", <titleSk>),("lastseenSk", <lastseenSk>)]
-    - titleSk:  
-      Key:        "#type#app#apptype#<blog, nft, game ...>#titlehash"#<Nat32>#score#<0-99>#id#<Nat>"
-      Attribute:  [("metadataSk", <metadataSk>)]
-    - lastseenSk: 
-      Key:        "#type#app#lastseen#<YYYY-MM-DD>#apptype#<blog, nft, game ...>#id#<Nat>"
-      Attribute   [("title"), ("subtitle"), ("content"), ("canisterid"), ("subnetid"), ("type"), ("apptype"), ("datalength"), ("lastseen"), ("id"), ("status"), ("notnull"), ("note")]
-    
-    - TF_SK:
+    - WORD_SK:
       Key:        "#word#<word>#host#<host>"
-      Attribute:  ["tf score"]
+      Attribute:  ["tf score"] // TF is term frequency in a document
     - METADATA_SK:
       Key:        "#host#<host>"
       Attribute:  
@@ -155,7 +145,7 @@ shared ({ caller = owner }) actor class Service({
       let new_metadata_attributes = switch (CanDB.get(db, {sk=metadata_sk})) {
         case (?entity) { // if the host already exsits, delete all word keys because it may doesn't include old words. then insert all wordkey below
           //wip
-          // delete all word keys
+          // delete all word keys , Note, this logi looks like high cost
           let newWordMapEntries =  Array.mapFilter<(Word, Nat), (Word, Nat)>(Iter.toArray<(Word, Nat)>(wordMap.entries()), func(word, cont) {
             switch (CanDB.get(db, {sk=jointText(["word", word, "host", host])})) {
               case (?e) {
@@ -386,5 +376,76 @@ shared ({ caller = owner }) actor class Service({
 
     return Buffer.toArray<(Host, [(Title, Path, Int, Int, [Tf])])>(resolvedPath);
    };
+
+   // TOTO
+   //func searchInTitle
+   /*
+  
+   */
+  
+  func titleScanOptions(limit: Nat, startSk: ?Text): CanDB.ScanOptions {
+    let skLowerBound = jointText(["host", ""]);
+    var skUpperBound = jointText(["host", "~"]); // '~' is the last byte of ASCII
+    switch (startSk) {
+      case (?startSk) skUpperBound := startSk;
+      case null {};
+    };
+    let scanOptions = {
+      skLowerBound;
+      skUpperBound;
+      limit = limit;
+      ascending = ?false; //search from newest
+    };
+  };
+
+  public query func getNextKeysForParallelSearchTitle(limit: Nat): async [Text] {
+    let sks = Buffer.Buffer<Text>(limit);
+
+    var nextKey = (CanDB.scan(db, titleScanOptions(limit, null))).nextKey;
+    label Loop loop{
+      switch (nextKey) {
+        case (?nk) {
+          sks.add(nk);
+          nextKey := (CanDB.scan(db, titleScanOptions(limit, ?nk))).nextKey;
+        };
+        case null break Loop;
+      };
+    };
+
+    return Buffer.toArray(sks)
+  };
+
+
+  public query func searchTitle(words: [Text], startSK: ?Text, limit: Nat): async [(Host, [(Title, Path, Int, Int, [Tf])])] {
+    let scanResult = CanDB.scan(db, titleScanOptions(limit, startSK));
+    let buffer = Buffer.Buffer<(Host, [(Title, Path, Int, Int, [Tf])])>(limit); // WIP limit
+
+    label SearchLoop for (entity in scanResult.entities.vals()) {
+
+      let (titles, page_paths, countOfWords, kindOfWords) = switch (
+        Entity.getAttributeMapValueForKey(entity.attributes, "titles"),
+        Entity.getAttributeMapValueForKey(entity.attributes, "pages"),
+        Entity.getAttributeMapValueForKey(entity.attributes, "countOfWords"),
+        Entity.getAttributeMapValueForKey(entity.attributes, "kindOfWords")
+      ) {
+        case (?#arrayText(titles), ?#arrayText(page_paths), ?#arrayInt(countOfWords), ?#arrayInt(kindOfWords)) (titles, page_paths, countOfWords, kindOfWords);
+        case _ continue SearchLoop;
+      };
+      var idx = 0;
+      for (title in titles.vals()) {
+        for (word in words.vals()) {
+          if (not Text.contains(Text.map(title , Prim.charToLower), #text word)) continue SearchLoop;
+        };
+        // find title that includes all words
+        let host = Iter.toArray<Text>(Text.split(entity.sk, #char '#'))[2];
+        buffer.add(host, [(title, page_paths[idx], countOfWords[idx], kindOfWords[idx], Array.map<Text, Float>(words, func(_){1.0}))]);
+        continue SearchLoop;
+        idx +=1;
+      };
+
+    };
+
+    return Buffer.toArray<(Host, [(Title, Path, Int, Int, [Tf])])>(buffer); //wip
+  };
 
 }

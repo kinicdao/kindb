@@ -11,7 +11,8 @@ import CA "mo:candb/CanisterActions";
 import CanisterMap "mo:candb/CanisterMap";
 import Utils "mo:candb/Utils";
 import Buffer "mo:stable-buffer/StableBuffer";
-import Service "./candb_service";
+// import Service "./candb_service";
+import Service "./tf_storage_service";
 import CanDbAdmin "mo:candb/CanDBAdmin";
 import RBT "mo:stable-rbtree/StableRBTree";
 

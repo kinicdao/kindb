@@ -8,6 +8,10 @@
       "main": "src/canisters/candb_service.mo",
       "type": "motoko"
     },
+    "tf_storage_service": {
+      "main": "src/canisters/tf_storage_service.mo",
+      "type": "motoko"
+    },
     "main": {
       "main": "src/canisters/main.mo",
       "type": "motoko"

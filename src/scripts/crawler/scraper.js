@@ -18,7 +18,7 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
 
     let res = await page.goto(working_href, {"waitUntil":"load"});
     if (res == null) throw new Error("page.got returns null");
-    if (res.status() >= 400) throw new Error("the page response is over 400 code");
+    if (res.status() >= 400) throw new Error(`the page response is over 400 code : ${res.status()}`);
 
     await waitTillHTMLRendered(page);
 
@@ -92,7 +92,7 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
       "lang" : lang,
       "word_tf" : word_tf, 
       "link_set" : Array.from(link_set),
-      "text": text
+      "text": text_content
     }
 
   }
