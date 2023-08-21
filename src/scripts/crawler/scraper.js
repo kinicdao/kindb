@@ -17,8 +17,8 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
     const origin = working_url.origin;
 
     let res = await page.goto(working_href, {"waitUntil":"load"});
-    if (res == null) throw new Error("page.got returns null");
-    if (res.status() >= 400) throw new Error(`the page response is over 400 code : ${res.status()}`);
+    if (res == null) return write_err_to_collection("page.got returns null", collection, working_url_pathname, title);
+    if (res.status() >= 400) return write_err_to_collection(`the page response is over 400 code : ${res.status()}`, collection, working_url_pathname, title);
 
     await waitTillHTMLRendered(page);
 
@@ -27,7 +27,7 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
     const body_element = await page.$("body");
     let text_content = await page.evaluate(elm => elm.innerText, body_element);
 
-    if (text_content.length == 0) throw new Error("text_content is empty");
+    if (text_content.length == 0) return write_err_to_collection("text_content is empty", collection, working_url_pathname, title);
 
     const lang = franc(text_content);
 
@@ -98,9 +98,7 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
   }
   catch (e) { // if the URL is broken, skip this page.
     console.log(`error in ${working_url_pathname}: \n${e}`);
-    if (e.toString == "TargetCloseError: Protocol error (Runtime.callFunctionOn): Session closed. Most likely the page has been closed.") throw e;
-    write_err_to_collection(e, collection, working_url_pathname, title);
-    return 
+    throw e;
   };
 
 };

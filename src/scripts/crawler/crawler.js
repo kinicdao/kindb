@@ -29,84 +29,52 @@ async function main(start_crawling_index) {
 
 async function crawling(browser, crawling_list, start_crawling_index) {
 
-  const MAX_CONCURRENCY = 15;
   const CRAWLING_LENGTH = crawling_list.length;
-  let crawling_index = start_crawling_index; // default -1;
-  let promises = [];
+  let crawling_index = start_crawling_index; // default '-1';
 
   const date = new Date()
   let crawling_date = date.toLocaleDateString('en-GB').split('/').reverse().join('');
 
-  // let all_collection = {};
-
   console.log("crawling_list len = " + CRAWLING_LENGTH)
 
-  for (let CONCURRENT_ID = 0; CONCURRENT_ID < MAX_CONCURRENCY; CONCURRENT_ID++) {
-    let page = await browser.newPage();
-    let p = new Promise((resolve) => {
-      
-      // lexical scope variables
-      while(crawling_list[++crawling_index]["type"] != "app") {};
-      let current_crawling_index = crawling_index;
-      let canisterId = crawling_list[crawling_index]["canisterid"];
-      let linked_url_count = 0;
-      let collection = {};
-      let unsearch = [`https://${canisterId}.raw.icp0.io`];
+  let page = await browser.newPage();
 
-      // console.log(`setting root href ${i}: ` + `https://${unsearch[0]}.raw.icp0.io`);
-      // console.log(`excusing id: ${CONCURRENT_ID} ` + working_href);
-      // console.log(`excusing id: ${CONCURRENT_ID} ` + working_href + " returned")
+  while (true) {
 
-      (async function loop() {
-        if (unsearch.length != 0) {
-          linked_url_count++;
-          const next_href = unsearch.shift();
-          await explore_one_page_V2(page, next_href, unsearch, collection);
-          console.log(`crawling_idx: ${current_crawling_index}, concurrent_id: ${CONCURRENT_ID}, canister: ${canisterId}, now deal: ${linked_url_count} ,rest unsaerch: ${unsearch.length} \n`)
-          loop();
-          return
-        };
-        
-        // Save the result
-        fs.writeFile(`src/scripts/crawler/word_chunks/idx_${Math.floor(current_crawling_index/1000)}K/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
-          if (err) console.log(err.message);
-        });
+    while(true) {
+      crawling_index++;
+      if (crawling_index >= CRAWLING_LENGTH) return;
+      console.log("canisterid: " + crawling_list[crawling_index].canisterid);
+      console.log("type: " + crawling_list[crawling_index]["type"])
+      let is_app_type = (crawling_list[crawling_index]["type"] == "app");
+      if (is_app_type) break;
 
-        if (crawling_index < CRAWLING_LENGTH){
-          // reset lexical scope variables
+    };
 
-          crawling_index++;
-          while(true) {
-            if (crawling_index >= CRAWLING_LENGTH) {resolve();return}
-            console.log("canisterid: " + crawling_list[crawling_index]["canisterid"]);
-            console.log("type: " + crawling_list[crawling_index]["type"])
-            let is_app_type = (crawling_list[crawling_index]["type"] == "app");
-            if (is_app_type) break;
+    let current_crawling_index = crawling_index;
+    let canisterId = crawling_list[current_crawling_index]["canisterid"];
+    let linked_url_count = 0;
+    let collection = {};
+    let unsearch = [`https://${canisterId}.raw.icp0.io`];
 
-            crawling_index++;
+    console.log("start scraping site")
 
-            // console.log("canisterid: " + crawling_list[crawling_index]["canisterid"] + ", type: " + crawling_list[crawling_index]["type"])
-          };
-          // while(crawling_list[++crawling_index]["type"] != "app") {};
-          
-          current_crawling_index = crawling_index;
-          canisterId = crawling_list[crawling_index]["canisterid"];
-          linked_url_count = 0;
-          collection = {};
-          unsearch = [`https://${canisterId}.raw.icp0.io`];
+    while (unsearch.length != 0) {
+      // 未サーチのリンクが０になるまで、explore_one_pageで処理する
+      // scrape pages until there are not un-searched links.s
+      linked_url_count++;
+      const next_href = unsearch.shift();
+      await explore_one_page_V2(page, next_href, unsearch, collection);
+      console.log(`crawling_idx: ${current_crawling_index}, concurrent_id: 0, canister: ${canisterId}, now deal: ${linked_url_count} ,rest unsaerch: ${unsearch.length} \n`)
+    };
 
-          console.log("start new site")
-          loop()
-          return
-        };
-        resolve();
-      })();
+    // Save the result
+    // fs.writeFile(`src/scripts/crawler/word_chunks/idx_${Math.floor(current_crawling_index/1000)}K/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
+    //   if (err) console.log(err.message);
+    // });
+    console.log(collection)
 
-    });
-    promises.push(p);
-  };
-
-  await Promise.all(promises);
+  }
 
   return;
 
