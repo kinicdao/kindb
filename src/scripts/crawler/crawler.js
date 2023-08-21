@@ -69,10 +69,9 @@ async function crawling(browser, crawling_list, start_crawling_index) {
     };
 
     // Save the result
-    // fs.writeFile(`src/scripts/crawler/word_chunks/idx_${Math.floor(current_crawling_index/1000)}K/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
-    //   if (err) console.log(err.message);
-    // });
-    console.log(collection)
+    fs.writeFile(`src/scripts/crawler/word_chunks/idx_${Math.floor(current_crawling_index/1000)}K/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
+      if (err) console.log(err.message);
+    });
 
   }
 
