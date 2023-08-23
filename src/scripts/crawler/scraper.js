@@ -63,7 +63,9 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
         if (sub_url_pathname == working_url_pathname) continue; // if it is same page, skip this link。
         if (sub_url_pathname.split("/").length > 5) continue; // too deep link
         if ((unsearch_hrefs.length + Object.keys(collection).length) > 10) continue;
-        if (sub_url_pathname.split('.')[1] == 'xml') continue;
+        const extention = sub_url_pathname.split('.')[1];
+        if (extention != '' && extention != 'html') continue;
+
         /*
         メモ
         sub_url.pathnameは、oringin/path/　と oringin/pathを区別しないので、最後の/をとる。
@@ -98,7 +100,9 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
   }
   catch (e) { // if the URL is broken, skip this page.
     console.log(`error in ${working_url_pathname}: \n${e}`);
-    throw e;
+    write_err_to_collection(e, collection, working_url_pathname, title);
+    // throw e;
+    return
   };
 
 };
