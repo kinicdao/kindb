@@ -11,6 +11,8 @@ import { type } from 'os';
 
 async function main(start_crawling_index) {
 
+  console.log("starting at " + start_crawling_index);
+
   const browser = await puppeteer.launch({
     headless : true,
     channel: 'chrome' // use local chrome app
@@ -39,27 +41,28 @@ async function crawling(browser, crawling_list, start_crawling_index) {
 
   let page = await browser.newPage();
 
-  while (true) {
+  try {
 
-    while(true) {
-      crawling_index++;
-      if (crawling_index >= CRAWLING_LENGTH) return;
-      console.log("canisterid: " + crawling_list[crawling_index].canisterid);
-      console.log("type: " + crawling_list[crawling_index]["type"])
-      let is_app_type = (crawling_list[crawling_index]["type"] == "app");
-      if (is_app_type) break;
+    while (true) {
 
-    };
+      while(true) {
+        crawling_index++;
+        if (crawling_index >= CRAWLING_LENGTH) return;
+        console.log("canisterid: " + crawling_list[crawling_index].canisterid);
+        console.log("type: " + crawling_list[crawling_index]["type"])
+        let is_app_type = (crawling_list[crawling_index]["type"] == "app");
+        if (is_app_type) break;
 
-    let current_crawling_index = crawling_index;
-    let canisterId = crawling_list[current_crawling_index]["canisterid"];
-    let linked_url_count = 0;
-    let collection = {};
-    let unsearch = [`https://${canisterId}.raw.icp0.io`];
+      };
 
-    console.log("start scraping site")
+      let current_crawling_index = crawling_index;
+      let canisterId = crawling_list[current_crawling_index]["canisterid"];
+      let linked_url_count = 0;
+      let collection = {};
+      let unsearch = [`https://${canisterId}.raw.icp0.io`];
 
-    try {
+      console.log("start scraping site")
+
       while (unsearch.length != 0) {
         // 未サーチのリンクが０になるまで、explore_one_pageで処理する
         // scrape pages until there are not un-searched links.s
@@ -74,13 +77,12 @@ async function crawling(browser, crawling_list, start_crawling_index) {
       fs.writeFile(`/Users/wyattbenno/desktop/kinicdb/src/scripts/crawler/word_chunks/idx_${Math.floor(current_crawling_index/1000)}K/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
         if (err) console.log(err.message);
       });
-
-    } catch (error) {
-      //restart at next index.
-      main(error + 1);
     }
-
-  }
+  } catch (error) {
+      await browser.close();
+      //restart at next index.
+      main(parseInt(error) + 1);
+  };
 
   return;
 
