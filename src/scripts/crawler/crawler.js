@@ -59,19 +59,26 @@ async function crawling(browser, crawling_list, start_crawling_index) {
 
     console.log("start scraping site")
 
-    while (unsearch.length != 0) {
-      // 未サーチのリンクが０になるまで、explore_one_pageで処理する
-      // scrape pages until there are not un-searched links.s
-      linked_url_count++;
-      const next_href = unsearch.shift();
-      await explore_one_page_V2(page, next_href, unsearch, collection);
-      console.log(`crawling_idx: ${current_crawling_index}, concurrent_id: 0, canister: ${canisterId}, now deal: ${linked_url_count} ,rest unsaerch: ${unsearch.length} \n`)
-    };
+    try {
+      while (unsearch.length != 0) {
+        // 未サーチのリンクが０になるまで、explore_one_pageで処理する
+        // scrape pages until there are not un-searched links.s
+        linked_url_count++;
+        const next_href = unsearch.shift();
 
-    // Save the result
-    fs.writeFile(`src/scripts/crawler/word_chunks/idx_${Math.floor(current_crawling_index/1000)}K/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
-      if (err) console.log(err.message);
-    });
+        await explore_one_page_V2(page, next_href, unsearch, collection, current_crawling_index);
+        console.log(`crawling_idx: ${current_crawling_index}, concurrent_id: 0, canister: ${canisterId}, now deal: ${linked_url_count} ,rest unsaerch: ${unsearch.length} \n`)
+      };
+
+      // Save the result
+      fs.writeFile(`/Users/wyattbenno/desktop/kinicdb/src/scripts/crawler/word_chunks/idx_${Math.floor(current_crawling_index/1000)}K/idx_${current_crawling_index}_${canisterId}.json`, JSON.stringify({"canisterId": canisterId, "collection": collection, "lastseen": crawling_date}, null, '    '), err => {
+        if (err) console.log(err.message);
+      });
+
+    } catch (error) {
+      //restart at next index.
+      main(error + 1);
+    }
 
   }
 

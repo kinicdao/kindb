@@ -7,7 +7,7 @@ import {franc} from 'franc';
 // Local scripts
 import {caloc_tf, waitTillHTMLRendered, delete_last_slash} from './utils.js';
 
-export async function explore_one_page_V2(page, working_href, unsearch_hrefs, collection) {
+export async function explore_one_page_V2(page, working_href, unsearch_hrefs, collection, current_crawling_index) {
   let working_url_pathname;
   let title;
   try {
@@ -101,8 +101,13 @@ export async function explore_one_page_V2(page, working_href, unsearch_hrefs, co
   catch (e) { // if the URL is broken, skip this page.
     console.log(`error in ${working_url_pathname}: \n${e}`);
     write_err_to_collection(e, collection, working_url_pathname, title);
-    // throw e;
-    return
+    if (e != "TimeoutError: Navigation timeout of 30000 ms exceeded") {
+      console.log("Continued at page " + JSON.stringify(current_crawling_index))
+      return;
+    } else {
+      console.log("Died at page " + JSON.stringify(current_crawling_index))
+      throw(JSON.stringify(current_crawling_index));
+    }
   };
 
 };
