@@ -117,6 +117,9 @@ function regex(words) {
 
 let page_count_include_the_word = {};
 
+let kinicDB = JSON.parse(fs.readFileSync('kinicDB.json', 'utf8'));
+
+
 
 // Load word data files
 const chunks = fs.readdirSync('src/scripts/crawler/word_chunks');
@@ -186,9 +189,26 @@ for (const chunk of chunks) {
       }
     });
 
-    fs.writeFile(`src/scripts/crawler/regulared_words_chunks/${chunk}/${filename}`, JSON.stringify(site, null, '    '), err => {
-      if (err) console.log(err.message);
+    let isOffcial = false
+
+    kinicDB.forEach((md) => {
+      if (md.canisterid == host && md.status == "official") {
+        isOffcial = true;
+      };
     });
+
+    if (isOffcial) {
+      fs.writeFile(`src/scripts/crawler/regulared_words_chunks/official/${chunk}/${filename}`, JSON.stringify(site, null, '    '), err => {
+        if (err) console.log(err.message);
+      });
+      // console.log("official " + host)
+    }
+    else {
+      fs.writeFile(`src/scripts/crawler/regulared_words_chunks/non_official/${chunk}/${filename}`, JSON.stringify(site, null, '    '), err => {
+        if (err) console.log(err.message);
+      });
+      // console.log("non official " + host)
+    }
 
   };
 
@@ -196,38 +216,5 @@ for (const chunk of chunks) {
     if (err) console.log(err.message);
   });
 
-  // let page_count_include_the_word = {};
-
-  // const SIZE = 500;
-
-  // console.log("sites length = " + sites.length)
-
-  // sites = sites.slice(start_index, end_index); // slice here
-
-  // sites.forEach((site, idx) => {
-  //   let host = site['canisterId'];
-  //   let page_infos = site['collection'];
-
-    // Object.entries(page_infos).forEach(([path, info] = entry) => {
-    //   if (info.word_tf.length == 0 || info.title == undefined) {
-    //     delete (sites[idx].collection)[path]
-    //     // console.log("delete " + site.canisterId);
-    //   }
-    //   else {
-    //     let words = Object.entries(info.word_tf).map(([word, count]) => {
-    //       const arr = new Array(count);
-    //       return arr.map(() => {word})
-    //     })
-    //     words = words.flat();
-    //     console.log(words)
-    //   };
-
-    // });
-  // });
-
-  // console.log( Object.entries(page_count_include_the_word))
-  // fs.writeFile(`src/scripts/crawler/page_count_include_the_word.json`, JSON.stringify(page_count_include_the_word, null, '    '), err => {
-  //   if (err) console.log(err.message);
-  // });
   
 }
