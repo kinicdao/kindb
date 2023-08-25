@@ -37,6 +37,6 @@ async function main(canisterId) {
   // console.log("finish")
 };
 
-const host = "h36jh-jyaaa-aaaaj-qajba-cai"
+const host = "g4s5h-daaaa-aaaad-qbdpq-cai"
 
 await main(host);

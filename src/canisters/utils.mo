@@ -18,6 +18,7 @@ import Array "mo:base/Array";
 import Time "mo:base/Time";
 import Float "mo:base/Float";
 import Result "mo:base/Result";
+import Order "mo:base/Order";
 
 import LexEncode "mo:lexicographic-encoding/EncodeInt";
 import JSON "mo:json/JSON";
@@ -229,6 +230,70 @@ module {
       }
     };
     return ?Buffer.toArray(buffer);
+  };
+
+  type PathIdx = Nat; // metadataに格納されているpages:[Path]のIndex
+  type Word = Text;
+  type Tf = Float; // idfはフロント側で計算すれば良いので
+  type Host = Text;
+  // Metadata
+  type Path = Text;
+  type Title = Text;
+
+
+  public func compareHost(a: (Host, [(PathIdx, Tf)]), b: (Host, [(PathIdx, Tf)])): Order.Order {
+    let (a_host, _) = a;
+    let (b_host, _) = b;
+    return Text.compare(a_host, b_host);
+  };
+
+
+
+  public func comparePage(a: (PathIdx, Tf), b: (PathIdx, Tf)): Order.Order {
+    let (a_pathIdx, _) = a;
+    let (b_pathIdx, _) = b;
+    return Nat.compare(a_pathIdx, b_pathIdx);
+  };
+
+  public func drop<T>(arr: [[T]], compare: (T, T)->Order.Order): [[T]]{
+
+    if (arr.size() == 0) return [];
+    // if (arr.size() == 1) return arr;
+
+    let sub_arr = Array.subArray<[T]>(arr, 1, arr.size()-1);
+    let a_arr = arr[0];
+
+    let set = Buffer.Buffer<Buffer.Buffer<T>>(arr.size());
+
+    label A_VAL for (a_val in arr[0].vals()) { // arr[0]の中の要素が、arr[1:]の中にあるかを確認する。
+      let set_sub = Buffer.Buffer<T>(arr.size());
+      set_sub.add(a_val);
+
+      for (b_arr:[T] in sub_arr.vals()) {
+        let b_buf = Buffer.fromArray<T>(b_arr);
+        switch (Buffer.binarySearch<T>(a_val, b_buf, compare)) {
+          case (?b_arr_idx){
+            let b_val = b_arr[b_arr_idx];
+            set_sub.add(b_val);
+          };
+          case _ continue A_VAL; // もしなければ、このa_valは飛ばす。
+        }
+      };
+
+      set.add(set_sub);
+    };
+    return Array.map<Buffer.Buffer<T>, [T]>(Buffer.toArray<Buffer.Buffer<T>>(set), func (buf) {
+      Buffer.toArray<T>(buf)
+    });
+
+  };
+  
+  func jointText(textArray: [Text]): Text {
+    var result = "";
+    for (t in textArray.vals()) {
+      result := result # "#" # t;
+    };
+    result
   };
 
 }

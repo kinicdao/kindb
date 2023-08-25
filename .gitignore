@@ -127,9 +127,12 @@ src/scripts/crawler/word_chunks/idx_39K/*
 
 
 
+
 !src/scripts/crawler/word_chunks/.gitkeep
 
 # uploading
 src/scripts/crawler/page_count_include_the_word
 src/scripts/crawler/log/*
 !src/scripts/crawler/log/.gitkeep
+
+src/scripts/crawler/regulared_words_chunks
