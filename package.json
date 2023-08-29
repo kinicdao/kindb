@@ -8,6 +8,7 @@
     "@dfinity/identity-secp256k1": "^0.15.5",
     "@dfinity/principal": "^0.15.5",
     "candb-client-typescript": "^0.0.0-alpha.1",
+    "commander": "^11.0.0",
     "crawlee": "^3.4.1",
     "franc": "^6.1.0",
     "node-fetch": "^3.3.1",

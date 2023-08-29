@@ -8,20 +8,19 @@ import fs from 'fs';
 
 import { caloc_tf } from "./caloc_tf.js";
 
+// parse command line argumetns
+import { Command } from 'commander';
+const program = new Command();
 
-async function upload(serviceCanisterId, identityName, sites, page_count_include_the_word) {
+
+async function upload(host, serviceCanisterId, identity, sites, page_count_include_the_word) {
   // set service canister client
-  const identity = importIdentity(identityName);
   const agent = new HttpAgent({
     identity: identity,
-    // host: "https://ic0.app",
-    host: "http://127.0.0.1:8080",
+    host: host,
     fetch,
   });
   const serviceActor = ServiceCreateActor(serviceCanisterId, {agent});
-
-  // const sites = JSON.parse(fs.readFileSync("src/scripts/crawler/words_0_500.json", 'utf8'));
-  // const sites = JSON.parse(fs.readFileSync("src/scripts/crawler/words_500_1000.json", 'utf8'));
 
   let arg = caloc_tf(sites, page_count_include_the_word);
   console.log("arg length "+ arg.length)
@@ -40,20 +39,65 @@ async function upload(serviceCanisterId, identityName, sites, page_count_include
 };
 
 
-if (process.argv.length != 5) throw "uploader.js <index canisterid> <your dfx identity name> <canister status/ offcial or non_offical>"
-let indexCanisterId = process.argv[2];
-let identityName = process.argv[3];
-let status = process.argv[4]
 
-console.log("canisterid = " + indexCanisterId);
+
+// Entry
+program
+  // .option('-d, --debug', 'output extra debugging')
+  .option('--public', 'use public network')
+  .option('--indexId <id>', 'candb index canister id')
+  .option('--name <name>', 'identity name')
+  .option('--official', 'official or non_official')
+  .option('--chunk <num>', 'start chunk index');
+
+program.parse(process.argv);
+const options = program.opts();
+// console.log(options)
+
+// set host
+let host = "http://127.0.0.1:8080";
+if (options.public == true) {
+  host = "https://ic0.app";
+  console.log("uploading data to public canister");
+}
+
+// set index canister id
+let indexCanisterId = "bkyz2-fmaaa-aaaaa-qaaaq-cai";
+if (options.indexId) {
+  indexCanisterId = options.indexId;
+}
+
+// set identity name
+let identityName = "default";
+if (options.name) {
+  identityName = options.name;
+}
+
+// set official or non_official
+let status = "non_official";
+if (options.official) {
+  status = "official";
+}
+
+// set start chunk index
+let start_chunk_idx = 0;
+if (options.chunk) {
+  start_chunk_idx = options.chunk
+}
+
+
+console.log("host = " + host);
+console.log("index canisterid = " + indexCanisterId);
 console.log("identity name = " + identityName);
+console.log("status = " + status)
 console.log("\n\n")
-// console.log("json path = " + jsonPath)
 
+// throw Error("")
+
+const identity = importIdentity(identityName);
 let agent = new HttpAgent({
-  // identity: identity,
-  // host: "https://ic0.app",
-  host: "http://127.0.0.1:8080",
+  identity: identity,
+  host: host,
   fetch,
 });
 let indexActor = IndexCreateActor(indexCanisterId, {agent});
@@ -61,10 +105,16 @@ let serviceCanisterId = (await indexActor.getCanistersByPK(status))[0];
 if (!serviceCanisterId) throw Error(`cannot fetch the serveice canister of "${status}"`);
 console.log("the serveice canister id is " + serviceCanisterId)
 
+let ave_length = [0, 0, 0];
+
 // Load word data files
-const chunks = fs.readdirSync(`src/scripts/crawler/regulared_words_chunks/${status}`);
+let chunks = fs.readdirSync(`src/scripts/crawler/regulared_words_chunks/${status}`);
+chunks = chunks.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+console.log(chunks)
+
 let l = 0;
-for (const chunk of chunks) {
+for (let chunk_idx = start_chunk_idx; chunk_idx < chunks.length; chunk_idx++) {
+  const chunk = chunks[chunk_idx];
   if (chunk == ".gitkeep" || chunk == ".DS_Store" || chunk == "page_count_include_the_word.json") continue
   console.log("chunk: " + chunk)
   const filenames = fs.readdirSync(`src/scripts/crawler/regulared_words_chunks/${status}/` + chunk);
@@ -77,11 +127,6 @@ for (const chunk of chunks) {
     if (filename == '.gitkeep' || filename == '.DS_Store') continue;
     sites.push(JSON.parse(fs.readFileSync(`src/scripts/crawler/regulared_words_chunks/${status}/${chunk}/${filename}`, 'utf8')));
   };
-
-  // Debug
-  // sites.forEach((site) => {
-  //   if (site.serviceCanisterId == "dsmzx-jaaaa-aaaak-qagra-cai") console.log("In file fetch, include dsmzx-jaaaa-aaaak-qagra-cai");
-  // });
 
   let page_count_include_the_word = {};
 
@@ -96,8 +141,13 @@ for (const chunk of chunks) {
     try {
       const sub = sites.slice(STR, END);
       console.log(STR + " - " +  END);
-      let res = await upload(serviceCanisterId, identityName, sub, page_count_include_the_word);
+      let res = await upload(host, serviceCanisterId, identity, sub, page_count_include_the_word);
       console.log(res)
+
+      ave_length[0] += res[0];
+      ave_length[1] += res[1];
+      ave_length[2] += res[2];
+
     }
     catch(e) {
       break
@@ -112,5 +162,6 @@ for (const chunk of chunks) {
 
 
 console.log("Finish Upload")
+console.log(ave_length)
 
 // node src/scripts/crawler/uploader.js be2us-64aaa-aaaaa-qaabq-cai default

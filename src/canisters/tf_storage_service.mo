@@ -36,7 +36,7 @@ shared ({ caller = owner }) actor class Service({
   owners: ?[Principal];
 }) {
   /// @required (may wrap, but must be present in some form in the canister)
-  stable let db = CanDB.init({
+  stable var db = CanDB.init({
     pk = partitionKey;
     scalingOptions = scalingOptions;
     btreeOrder = null;
@@ -187,9 +187,42 @@ shared ({ caller = owner }) actor class Service({
     return Buffer.toArray<CanDB.PutOptions>(buffer);
   };
 
-  public func batchPut(sites :[(Host, [Path], [Title], [CountOfWord], [KindOfWord], [(Word, ([Tf], [PathIdx]))])]): async () {
+  func isOwner(caller: Principal): Bool {
+    if (Principal.isAnonymous(caller)) return false;
+    switch (owners) {
+      case (?owners) {
+        for (o in owners.vals()) {
+          if (o == caller) return true
+        };
+        return false
+      };
+      case null return false
+    }
+  };
+
+  public shared({caller = caller}) func batchPut(sites :[(Host, [Path], [Title], [CountOfWord], [KindOfWord], [(Word, ([Tf], [PathIdx]))])]): async () {
+    // auth owner
+    if (not isOwner(caller)) throw Error.reject("not authorized");
+
     let batchOptions = createBatchOptions(sites);
     await* CanDB.batchPut(db, batchOptions);
+  };
+
+  public shared({caller = caller}) func reset(): async () {
+    if (not isOwner(caller)) throw Error.reject("not authorized");
+
+    // rest candb
+    db := CanDB.init({
+      pk = partitionKey;
+      scalingOptions = scalingOptions;
+      btreeOrder = null;
+    });
+
+    // reset word map
+    wordMap := HashMap.HashMap<Word, Nat>(stableEntries.size(), Text.equal, Text.hash);
+
+    Debug.print "The db have been reseted";
+
   };
 
 
