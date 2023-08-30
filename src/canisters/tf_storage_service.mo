@@ -114,6 +114,19 @@ shared ({ caller = owner }) actor class Service({
       case _ wordMap.put(word, 1);
     };
   };
+  func decWordCount(word: Word) {
+    switch (wordMap.get(word)) {
+      case (?count) {
+        if (count == 1) {
+          wordMap.delete(word)
+        }
+        else {
+          wordMap.put(word, count-1);
+        }
+      };
+      case _ {};
+    };
+  };
   func exsitsWords(words: [Word]): ?[Nat] {
     let buf = Buffer.Buffer<Nat>(words.size());
     for (word in words.vals()) {
@@ -146,18 +159,16 @@ shared ({ caller = owner }) actor class Service({
         case (?entity) { // if the host already exsits, delete all word keys because it may doesn't include old words. then insert all wordkey below
           //wip
           // delete all word keys , Note, this logi looks like high cost
-          let newWordMapEntries =  Array.mapFilter<(Word, Nat), (Word, Nat)>(Iter.toArray<(Word, Nat)>(wordMap.entries()), func(word, cont) {
+          ignore Array.mapFilter<(Word, Nat), (Word, Nat)>(Iter.toArray<(Word, Nat)>(wordMap.entries()), func(word, cont) {
             switch (CanDB.get(db, {sk=jointText(["word", word, "host", host])})) {
               case (?e) {
                 CanDB.delete(db, {sk=e.sk});
-                if (cont == 1) {return null};
-
-                return ?(word, cont-1);
+                decWordCount(word);
+                return null;
               };
               case _ null;
             };
           });
-          wordMap := HashMap.fromIter<Word, Nat>(newWordMapEntries.vals(), newWordMapEntries.size(), Text.equal, Text.hash);
 
           // override attributes
           Entity.extractKVPairsFromAttributeMap(
@@ -172,6 +183,7 @@ shared ({ caller = owner }) actor class Service({
       buffer.add({sk=metadata_sk; attributes=new_metadata_attributes});
 
       for ((word, (tfs, idxs)) in words.vals()) {
+        // Debug.print(word # ", " # debug_show(wordMap.get(word)));
         let sk = jointText(["word", word, "host", host]);
         let attributes = [
           ("tfs", #arrayFloat tfs),
@@ -179,9 +191,11 @@ shared ({ caller = owner }) actor class Service({
         ];
         incWordCount(word);
         buffer.add({sk; attributes});
+        // Debug.print(word # ", " # debug_show(wordMap.get(word)));
       };
 
       // if (not CanDB.skExists(db, sk)) host_count +=1; // this count is used for scan limit
+      // Debug.print("\n");
     };
 
     return Buffer.toArray<CanDB.PutOptions>(buffer);
@@ -304,7 +318,10 @@ shared ({ caller = owner }) actor class Service({
     
     let wordCount = switch (exsitsWords(words)) {
       case (?wordCount) wordCount;
-      case _ return [];
+      case _ {
+        Debug.print "the word is not in wordmap";
+        return [];
+      };
     };
 
     var hits: [var [HitPagesOfHost]] = Array.init<[HitPagesOfHost]>(words.size(), []);
@@ -479,6 +496,11 @@ shared ({ caller = owner }) actor class Service({
     };
 
     return Buffer.toArray<(Host, [(Title, Path, Int, Int, [Tf])])>(buffer); //wip
+  };
+
+  /* --- Debug --- */
+  public query func getWordMap(): async [(Word, Nat)] {
+    return Iter.toArray(wordMap.entries());
   };
 
 }

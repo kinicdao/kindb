@@ -143,7 +143,7 @@ shared ({ caller = initial_owner })  actor class IndexCanister() = this {
     // Pre-load 300 billion cycles for the creation of a new Service canister
     // Note that canister creation costs 100 billion cycles, meaning there are 200 billion
     // left over for the new canister when it is created
-    Cycles.add(300_000_000_000);
+    Cycles.add(1_000_000_000_000); // Note, add 1T cycle
     let newServiceCanister = await Service.Service({
       partitionKey = pk;
       scalingOptions = {
