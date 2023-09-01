@@ -16,7 +16,7 @@ SCRIPT_DIR=$(dirname "$SCRIPT")
 cd $SCRIPT_DIR
 
 TITLE="🤖 Excuse CommitProposedBatch function"
-URL="https://dashboard.internetcomputer.org/sns/7jkta-eyaaa-aaaaq-aaarq-cai/proposal/8"
+URL=""
 SUMMARY="This proposal excuses CommitProposedBatch function witch allows SNS to commit proposed batch."
 BLOB="$(${COMMAND_ROOT}/bin/didc encode --format blob "(record { batch_id = ${BATCH_ID}; evidence = blob \"${EVIDENCE_BLOB}\"})")"
 
