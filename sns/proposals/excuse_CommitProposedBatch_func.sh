@@ -7,7 +7,7 @@ BATCH_ID=$2
 EVIDENCE=$3
 CID=${4:-"74iy7-xqaaa-aaaaf-qagra-cai"}
 FUNCTION_ID=${5:-1003}
-EVIDENCE_BLOB=$(bin/didc decode "4449444c016d7b010020${EVIDENCE}" | grep "^  blob " | sed -e "s/  blob //; s/,//; s/\"//g; ")
+EVIDENCE_BLOB=$(bin/didc decode "4449444c016d7b010020${EVIDENCE}" | sed -e "s/(blob //; s/,//; s/\"//g; s/)//")
 
 
 # Set current directory to the directory this script is in
@@ -16,7 +16,7 @@ SCRIPT_DIR=$(dirname "$SCRIPT")
 cd $SCRIPT_DIR
 
 TITLE="🤖 Excuse CommitProposedBatch function"
-URL=""
+URL="https://dashboard.internetcomputer.org/sns/7jkta-eyaaa-aaaaq-aaarq-cai"
 SUMMARY="This proposal excuses CommitProposedBatch function witch allows SNS to commit proposed batch."
 BLOB="$(${COMMAND_ROOT}/bin/didc encode --format blob "(record { batch_id = ${BATCH_ID}:nat; evidence = blob \"${EVIDENCE_BLOB}\"})")"
 
