@@ -6,7 +6,7 @@
     AddGenericNervousSystemFunction = record {
       id=1005:nat64;
       name="commit_proposed_batch";
-      description = opt "commit the batch that proposed by community who has Prepare permisson";
+      description = opt "commit the batch that proposed by community who has Prepare permission";
       function_type = opt variant {
         GenericNervousSystemFunction = record{
           validator_canister_id = opt principal "va3nt-myaaa-aaaak-afjga-cai";
