@@ -1,0 +1,20 @@
+(record {
+  title="🤖 Register GrantAssetPermission function of RAG-Demo asset canister";
+  url="https://va3nt-myaaa-aaaak-afjga-cai.icp0.io/";
+  summary="This proposal adds a new custom function which allows SNS to ** grant ** permissions to va3nt-myaaa-aaaak-afjga-cai which is RAG-Demo asset canister.";
+  action=opt variant {
+    AddGenericNervousSystemFunction = record {
+      id=1004:nat64; 
+      name="grant_permission"; 
+      description="grant permission to asset canister"; 
+      function_type=opt variant {
+        GenericNervousSystemFunction=record{
+          validator_canister_id=opt principal"va3nt-myaaa-aaaak-afjga-cai"; 
+          target_canister_id=opt principal"va3nt-myaaa-aaaak-afjga-cai"; 
+          validator_method_name=opt"validate_grant_permission"; 
+          target_method_name=opt"grant_permission"
+        }
+      }
+    }
+  }
+})
