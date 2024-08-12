@@ -1,0 +1,20 @@
+(record {
+  title="🤖 Register CommitProposedBatch function of KinicUI asset canister";
+  url="ai.kinic.io";
+  summary="This proposal adds a new custom function which allows SNS to commit proposed batch of xcvai-qiaaa-aaaak-afowq-cai that is KinicUI asset canister.";
+  action=opt variant {
+    AddGenericNervousSystemFunction = record {
+      id=1006:nat64;
+      name="commit_proposed_batch_of_kinic_ui";
+      description = opt "commit the batch that proposed by community who has Prepare permission";
+      function_type = opt variant {
+        GenericNervousSystemFunction = record{
+          validator_canister_id = opt principal "xcvai-qiaaa-aaaak-afowq-cai";
+          target_canister_id = opt principal "xcvai-qiaaa-aaaak-afowq-cai";
+          validator_method_name = opt "validate_commit_proposed_batch";
+          target_method_name = opt "commit_proposed_batch"
+        }
+      }
+    }
+  }
+})
